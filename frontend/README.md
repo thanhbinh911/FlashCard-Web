@@ -71,3 +71,5 @@ export default defineConfig([
   },
 ])
 ```
+
+AE clone về rồi chạy npm install trên cmd là được 
