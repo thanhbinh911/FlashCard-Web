@@ -10,17 +10,18 @@ const FlashCard = ({ flashcard }: FlashCardProps) => {
   const [flip, setFlip] = React.useState(false)
 
   return (
-    <div onClick={() => setFlip(!flip)}>
-      {flip ? 
-      <div>
+    <div
+      className={`card ${flip ? 'flip' : ''}`}
+      onClick={() => setFlip(!flip)}
+    >
+      <div className='front'>
         <h2>{flashcard.question}</h2>
-        {flashcard.answer}
-      </div> : 
-      <div>
-        <h2>{flashcard.question}</h2>
-        {flashcard.options.map((option,index) => 
-          <p key={index}>{option}</p>)}
-      </div>}
+        <div className='flashcard-options'>
+          {flashcard.options.map((option,index) => 
+            <p className='card-option' key={`card${index}`}>{option}</p>)}
+        </div>
+      </div>
+      <div className='back'>{flashcard.answer}</div>
     </div>
   )
 }
