@@ -19,6 +19,7 @@ public class ReportEntity {
     @JoinColumn(name = "reported_deck_id", referencedColumnName = "deck_id", nullable = false)
     private DeckEntity reportedDeck;
 
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String reason;
 
     @Column(name = "created_at", nullable = false, updatable = false, insertable = false)

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api") // Sử dụng RequestMapping gốc để xử lý các endpoint lồng nhau
+@RequestMapping("/api") 
 public class FlashcardController {
 
     @Autowired
@@ -39,7 +39,7 @@ public class FlashcardController {
     @DeleteMapping("/flashcards/{flashcardId}")
     public ResponseEntity<Map<String, String>> deleteFlashcard(@PathVariable Long flashcardId) {
         flashcardService.deleteFlashcard(flashcardId);
-        // Trả về message khớp với hợp đồng API
+
         Map<String, String> response = Collections.singletonMap("message", "Flashcard deleted successfully");
         return ResponseEntity.ok(response);
     }

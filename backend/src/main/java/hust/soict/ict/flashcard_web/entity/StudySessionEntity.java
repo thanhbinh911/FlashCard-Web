@@ -25,6 +25,7 @@ public class StudySessionEntity {
 
     @Column(name = "end_time")
     private LocalDateTime endedAt;
+    
     public StudySessionEntity() {
     }
 

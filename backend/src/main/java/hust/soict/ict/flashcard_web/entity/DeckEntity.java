@@ -20,9 +20,11 @@ public class DeckEntity {
     @JoinColumn(name = "user_id",  nullable = false)
     private UserEntity user;
 
-    @Column(name = "title", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description; 
 
     @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
     private LocalDateTime createdAt;
@@ -48,8 +50,16 @@ public class DeckEntity {
         return title;
     }
 
-    public void setTitle(String tile) {
+    public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -3,6 +3,7 @@ package hust.soict.ict.flashcard_web.dto;
 public class FlashcardRequest {
     private String questionText;
     private String answerText;
+    private String hint;
 
     public String getQuestionText() {
         return questionText;
@@ -18,5 +19,13 @@ public class FlashcardRequest {
 
     public void setAnswerText(String answerText) {
         this.answerText = answerText;
+    }
+
+    public String getHint() {
+        return hint;
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
     }
 }

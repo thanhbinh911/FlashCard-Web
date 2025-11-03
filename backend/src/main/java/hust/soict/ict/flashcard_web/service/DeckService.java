@@ -2,57 +2,130 @@ package hust.soict.ict.flashcard_web.service;
 
 import hust.soict.ict.flashcard_web.dto.DeckRequest;
 import hust.soict.ict.flashcard_web.dto.DeckResponse;
+import hust.soict.ict.flashcard_web.entity.DeckEntity;
+import hust.soict.ict.flashcard_web.entity.UserEntity;
+import hust.soict.ict.flashcard_web.repository.DeckRepository;
+import hust.soict.ict.flashcard_web.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
+
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DeckService {
 
-    // Giả lập một danh sách decks trong bộ nhớ để làm việc với
-    private final List<DeckResponse> mockDecks = new ArrayList<>(Arrays.asList(
-        new DeckResponse(1L, "Học từ vựng IELTS", "Các từ vựng band 8.0", "2025-10-16T21:30:00Z"),
-        new DeckResponse(2L, "Lịch sử Việt Nam", "Các mốc sự kiện quan trọng", "2025-10-15T10:00:00Z")
-    ));
+    @Autowired
+    private DeckRepository deckRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
+    private UserEntity getCurrentAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+
+            throw new RuntimeException("Người dùng chưa được xác thực.");
+        }
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername(); 
+
+        return userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với email: " + userEmail));
+    }
+
+
+    private void checkDeckOwnership(DeckEntity deck, UserEntity user) {
+
+        if (!deck.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Bạn không có quyền truy cập hoặc chỉnh sửa Deck này.");
+
+        }
+    }
+
+    private DeckResponse convertToResponse(DeckEntity entity) {
+        String formattedDate = (entity.getCreatedAt() != null)
+                ? entity.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                : null;
+
+        return new DeckResponse(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getDescription(),
+                formattedDate
+        );
+    }
+
 
     public List<DeckResponse> getAllDecks() {
-        System.out.println("Mock API: Lấy tất cả decks.");
-        return mockDecks;
+        UserEntity currentUser = getCurrentAuthenticatedUser();
+
+
+        return deckRepository.findByUser_Id(currentUser.getId())
+                .stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
     }
 
     public DeckResponse getDeckById(Long deckId) {
-        System.out.println("Mock API: Lấy chi tiết deck có ID: " + deckId);
-        return mockDecks.stream()
-                        .filter(deck -> deck.getId().equals(deckId))
-                        .findFirst()
-                        .orElse(mockDecks.get(0));
+        UserEntity currentUser = getCurrentAuthenticatedUser();
+        DeckEntity deck = deckRepository.findById(deckId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy Deck với ID: " + deckId));
+
+
+        checkDeckOwnership(deck, currentUser);
+
+        return convertToResponse(deck);
     }
 
+  
     public DeckResponse createDeck(DeckRequest request) {
-        System.out.println("Mock API: Đã nhận yêu cầu tạo deck: " + request.getTitle());
-        DeckResponse newDeck = new DeckResponse(
-            (long) (mockDecks.size() + 1),
-            request.getTitle(),
-            request.getDescription(),
-            Instant.now().toString()
-        );
-        mockDecks.add(newDeck);
-        return newDeck;
+
+        UserEntity currentUser = getCurrentAuthenticatedUser();
+
+
+        DeckEntity newDeck = new DeckEntity();
+        newDeck.setTitle(request.getTitle());
+        newDeck.setDescription(request.getDescription());
+        
+
+        newDeck.setUser(currentUser);
+
+        DeckEntity savedDeck = deckRepository.save(newDeck);
+        return convertToResponse(savedDeck);
     }
 
     public DeckResponse updateDeck(Long deckId, DeckRequest request) {
-        System.out.println("Mock API: Cập nhật deck có ID: " + deckId);
-        return new DeckResponse(
-            deckId,
-            request.getTitle(),
-            request.getDescription(),
-            Instant.now().toString()
-        );
+        UserEntity currentUser = getCurrentAuthenticatedUser();
+        DeckEntity existingDeck = deckRepository.findById(deckId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy Deck với ID: " + deckId));
+
+
+        checkDeckOwnership(existingDeck, currentUser);
+
+        existingDeck.setTitle(request.getTitle());
+        existingDeck.setDescription(request.getDescription());
+
+        DeckEntity updatedDeck = deckRepository.save(existingDeck);
+        return convertToResponse(updatedDeck);
     }
 
+
     public void deleteDeck(Long deckId) {
-        System.out.println("Mock API: Xóa deck có ID: " + deckId);
+        UserEntity currentUser = getCurrentAuthenticatedUser();
+        DeckEntity deckToDelete = deckRepository.findById(deckId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy Deck với ID: " + deckId));
+
+
+        checkDeckOwnership(deckToDelete, currentUser);
+
+        deckRepository.delete(deckToDelete);
     }
 }
