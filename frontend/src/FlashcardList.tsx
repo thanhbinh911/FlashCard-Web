@@ -1,6 +1,6 @@
 //import React from 'react'
 import FlashCard from './FlashCard'
-import type { Flashcard } from './type'
+import type { Flashcard } from './model/cardModel'
 
 interface FlashcardListProps {
   flashcards: Flashcard[]
