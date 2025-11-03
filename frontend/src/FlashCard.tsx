@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import type { Flashcard } from './type'
+import type { Flashcard } from './model/cardModel'
 
 interface FlashCardProps {
   flashcard: Flashcard
