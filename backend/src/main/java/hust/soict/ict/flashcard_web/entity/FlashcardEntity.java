@@ -4,6 +4,8 @@ package hust.soict.ict.flashcard_web.entity;
 import jakarta.persistence.*;
 import java.util.List;
 
+@Entity
+@Table(name = "flashcards")
 public class FlashcardEntity {
     @Id
     @Column(name = "flashcard_id")

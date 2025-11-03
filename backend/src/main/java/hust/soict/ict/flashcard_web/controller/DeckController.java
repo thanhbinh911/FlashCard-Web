@@ -45,7 +45,7 @@ public class DeckController {
     @DeleteMapping("/{deckId}")
     public ResponseEntity<Map<String, String>> deleteDeck(@PathVariable Long deckId) {
         deckService.deleteDeck(deckId);
-        // Trả về message khớp với hợp đồng API
+   
         Map<String, String> response = Collections.singletonMap("message", "Deck deleted successfully");
         return ResponseEntity.ok(response);
     }
