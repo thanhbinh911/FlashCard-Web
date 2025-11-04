@@ -8,10 +8,10 @@ import jakarta.persistence.*;
 public class DeckCategoryEntity {
     @EmbeddedId
     @AttributeOverrides(
-        {
-            @AttributeOverride(name = "deckId", column = @Column(name = "deck_id")),
-            @AttributeOverride(name = "categoryId", column = @Column(name = "category_id"))
-        }
+            {
+             @AttributeOverride(name = "deckId", column = @Column(name = "deck_id")),
+                    @AttributeOverride(name = "categoryId", column = @Column(name = "category_id"))
+            }
     )
     private DeckCategoryId id = new DeckCategoryId();
 

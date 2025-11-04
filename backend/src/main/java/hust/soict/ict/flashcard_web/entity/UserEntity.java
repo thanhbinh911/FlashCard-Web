@@ -38,6 +38,22 @@ public class UserEntity {
     @OneToMany(mappedBy = "reportedByUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReportEntity> reports;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentEntity> comments;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private AdminEntity admin;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudySessionEntity> studySessions;
+
+    @OneToMany(mappedBy = "usesr", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FeedbackEntity> feedbacks;
+
+
+
+
+
     // Constructors
     public UserEntity() { // default constructor required by JPA
     }

@@ -20,6 +20,12 @@ public class DeckEntity {
     @JoinColumn(name = "user_id",  nullable = false)
     private UserEntity user;
 
+    @OneToMany(mappedBy =  "reportedDeck", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReportEntity> reports;
+
+
+
+
     @Column(name = "title", columnDefinition = "TEXT", nullable = false)
     private String title;
 

@@ -2,6 +2,7 @@ package hust.soict.ict.flashcard_web.entity;
 
 
 import jakarta.persistence.*;
+import java.util.List;
 
 public class FlashcardEntity {
     @Id
@@ -12,6 +13,9 @@ public class FlashcardEntity {
     @ManyToOne
     @JoinColumn(name = "deck_id", referencedColumnName = "deck_id", nullable = false)
     private DeckEntity deck;
+
+    @OneToMany (mappedBy = "flashcard", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SessionFlashcardEntity> sessionFlashcards;
 
     @Column (name = "question_text", columnDefinition = "TEXT", nullable = false)
     private String question;

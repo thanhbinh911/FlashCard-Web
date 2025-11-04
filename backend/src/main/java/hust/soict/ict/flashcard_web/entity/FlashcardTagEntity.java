@@ -1,13 +1,15 @@
 package hust.soict.ict.flashcard_web.entity;
 import jakarta.persistence.*;
 
+
+
 @Entity
 @Table(name = "flashcard_tags")
 public class FlashcardTagEntity {
     @EmbeddedId
     @AttributeOverrides(
             {
-             @AttributeOverride(name = "flashcardId", column = @Column(name = "flashcard_id")),
+                    @AttributeOverride(name = "flashcardId", column = @Column(name = "flashcard_id")),
                     @AttributeOverride(name = "tagId", column = @Column(name = "tag_id"))
             }
     )

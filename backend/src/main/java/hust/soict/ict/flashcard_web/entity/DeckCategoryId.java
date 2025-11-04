@@ -1,12 +1,12 @@
 package hust.soict.ict.flashcard_web.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable // Indicate that this class can be embedded in an entity
 public class DeckCategoryId implements Serializable {
-
     private Long deckId;
     private Long categoryId;
 

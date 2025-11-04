@@ -3,6 +3,7 @@ package hust.soict.ict.flashcard_web.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "study_sessions")
@@ -19,6 +20,10 @@ public class StudySessionEntity {
     @ManyToOne
     @JoinColumn(name = "deck_id", nullable = false)
     private DeckEntity deck;
+
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SessionFlashcardEntity> sessionFlashcards;
+
 
     @Column(name = "start_time", nullable = false, updatable = false, insertable = false)
     private LocalDateTime startedAt;
