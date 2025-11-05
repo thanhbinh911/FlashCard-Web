@@ -13,6 +13,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; 
 
+import org.springframework.security.config.Customizer;
+
 /**
  * This class configures the security settings for the application, including authentication and authorization.
  * It enables web security and defines rules for accessing different parts of the application.
@@ -50,6 +52,11 @@ public class SecurityConfig {
         http
                 // Disable CSRF (Cross-Site Request Forgery) protection, as we are using JWTs for session management
                 .csrf(csrf -> csrf.disable())
+
+                // Enable CORS (Cross-Origin Resource Sharing) with default settings.
+                // This will use the `corsConfigurationSource` bean defined in `ApplicationConfig`.
+                .cors(Customizer.withDefaults())
+
                 // Configure authorization rules for HTTP requests
                 .authorizeHttpRequests(authorize -> authorize
                         // Allow all requests to endpoints under "/api/auth/" (e.g., login, register)
