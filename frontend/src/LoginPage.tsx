@@ -13,17 +13,10 @@ interface AuthResponse {
  * and navigates the user to the flashcards page.
  */
 function Login() {
-<<<<<<< HEAD
   const navigate = useNavigate();
   // State for storing the user's email and password from the form inputs.
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-=======
-  const navigate = useNavigate()
-  //const [username, setUsername] = React.useState('')
-  const [password, setPassword] = React.useState('')
-  const [email, setEmail] = React.useState('')
->>>>>>> main
 
   /**
    * Handles the form submission for the login process.
@@ -31,22 +24,15 @@ function Login() {
    * @param e - The form event.
    */
   function handleLogin(e: React.FormEvent<HTMLFormElement>) {
-<<<<<<< HEAD
     e.preventDefault(); // Prevent the default form submission behavior.
 
     // Send a POST request to the login API endpoint.
-=======
-    e.preventDefault()
-    //navigate('/flashcards')
-    // Handle login logic here
->>>>>>> main
     fetch('http://localhost:8080/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'  
       },
       body: JSON.stringify({
-<<<<<<< HEAD
         email,    // The backend's LoginRequest.java expects "email".
         password
       })
@@ -61,18 +47,6 @@ function Login() {
         // Throw an error to be caught by the .catch() block.
         throw new Error('Login failed: ' + response.status + ' ' + errorText);
       }
-=======
-        email,
-        password
-      })
-    })
-    .then((response) => {
-      console.log('receive response:', response)
-      if (!response.ok) {
-        alert('Login failed')
-      } 
-      return response.json()
->>>>>>> main
     })
     .then(data => {
       // On successful login, store the token and username.
@@ -94,7 +68,6 @@ function Login() {
       <h2>Login Page</h2>
       <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <div>
-<<<<<<< HEAD
           {/* The backend uses email for login, so the label should be "Email". */}
           <label htmlFor="email">Email:</label>
           <input 
@@ -106,11 +79,6 @@ function Login() {
             required
             style={{ width: '100%' }}
           />
-=======
-          <label htmlFor="email">Email:</label>
-          <input type="text" id="email" name="email" value={email} onChange={(e) => 
-            setEmail(e.target.value)} />
->>>>>>> main
         </div>
         <div>
           <label htmlFor="password">Password:</label>
