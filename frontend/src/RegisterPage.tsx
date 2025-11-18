@@ -29,16 +29,9 @@ function Register() {
    * @param e - The form event.
    */
   const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent the default form submission behavior.
-
-    // Check if the entered passwords match.
-    if (password !== confirmPassword) {
-        alert("Passwords do not match!");
-        return;
-    }
-
-    // Send the complete data required by the backend's RegisterRequest.
-    fetch('http://localhost:8080/api/auth/register', {
+    e.preventDefault()
+    // Handle registration logic here
+    fetch('http://localhost:8080/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -51,7 +44,7 @@ function Register() {
         password
       })
     })
-    .then(async (response) => {
+    .then((response) => {
       if (response.ok) {
         // If the response is successful, parse the JSON body.
         return response.json() as Promise<AuthResponse>;
