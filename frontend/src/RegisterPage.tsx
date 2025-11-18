@@ -31,7 +31,7 @@ function Register() {
   const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     // Handle registration logic here
-    fetch('http://localhost:8080/api/register', {
+    fetch('http://localhost:8080/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -44,7 +44,7 @@ function Register() {
         password
       })
     })
-    .then((response) => {
+    .then(async (response) => {
       if (response.ok) {
         // If the response is successful, parse the JSON body.
         return response.json() as Promise<AuthResponse>;
