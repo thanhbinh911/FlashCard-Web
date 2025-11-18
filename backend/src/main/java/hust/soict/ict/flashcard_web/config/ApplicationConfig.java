@@ -39,9 +39,13 @@ public class ApplicationConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // Allow all origins, methods, and headers. This is a permissive configuration.
         // For production, it's recommended to restrict origins to specific domains.
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("*"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:3000", 
+            "http://localhost:5173"  
+        ));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
         // Allow credentials (like cookies and authentication headers) to be sent
         configuration.setAllowCredentials(true);
         
