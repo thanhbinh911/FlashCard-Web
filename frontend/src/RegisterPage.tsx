@@ -12,7 +12,11 @@ function Register() {
   const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     // Handle registration logic here
-    fetch('http://localhost:8080/api/register', {
+    if (password !== confirmPassword) {
+      alert('Passwords do not match')
+      return
+    }
+    fetch('http://localhost:8080/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -24,6 +28,7 @@ function Register() {
       })
     })
     .then((response) => {
+      console.log('receive response:', response)
       if (response.ok) {
         return response.json()
       }
