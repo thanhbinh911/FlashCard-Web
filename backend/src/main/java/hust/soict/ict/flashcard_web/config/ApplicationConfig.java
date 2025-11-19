@@ -30,26 +30,24 @@ public class ApplicationConfig {
 
     /**
      * Configures Cross-Origin Resource Sharing (CORS) for the application.
-     * This allows the frontend application (running on a different origin) to make requests to the backend API.
+     * This allows web applications from any origin to make requests to the backend API.
      *
      * @return a CorsConfigurationSource instance.
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Define the list of allowed origins (e.g., frontend development server)
-        configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000",
-            "http://localhost:5173"
+        // Allow all origins, methods, and headers. This is a permissive configuration.
+        // For production, it's recommended to restrict origins to specific domains.
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:3000", 
+            "http://localhost:5173"  
         ));
-        // Define the list of allowed HTTP methods
-        configuration.setAllowedMethods(List.of("*"));
-        // Define the list of allowed headers
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
         // Allow credentials (like cookies and authentication headers) to be sent
         configuration.setAllowCredentials(true);
-
-        configuration.setExposedHeaders(List.of("*"));
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         // Apply this CORS configuration to all paths in the application
