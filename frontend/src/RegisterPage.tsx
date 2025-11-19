@@ -29,13 +29,10 @@ function Register() {
     })
     .then((response) => {
       console.log('receive response:', response)
-      if (response.ok) {
-        return response.json()
+      if (!response.ok) {
+        throw new Error("Registration failed")
       }
-      else {
-        // Handle error
-        alert('Registration failed')
-      }
+      return response.json()
     })
     .then(data => {
       console.log('Registration successful:', data.token)
@@ -44,6 +41,7 @@ function Register() {
     })
     .catch((error) => {
       console.error('Error during registration:', error)
+      alert("Registration failed")
     })
   }
 
