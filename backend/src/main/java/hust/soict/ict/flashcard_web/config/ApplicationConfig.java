@@ -39,15 +39,17 @@ public class ApplicationConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // Define the list of allowed origins (e.g., frontend development server)
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000", 
-            "http://localhost:5173"  
+            "http://localhost:3000",
+            "http://localhost:5173"
         ));
         // Define the list of allowed HTTP methods
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("*"));
         // Define the list of allowed headers
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of("*"));
         // Allow credentials (like cookies and authentication headers) to be sent
         configuration.setAllowCredentials(true);
+
+        configuration.setExposedHeaders(List.of("*"));
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         // Apply this CORS configuration to all paths in the application
