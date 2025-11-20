@@ -91,6 +91,12 @@ useEffect(() => {
             {loading ? 'Loading...' : 'Generate'}
           </button>
         </div>
+        <div className="form-group">
+          <button className="btn">Create Deck</button>
+        </div>
+        <div>
+          <button className="btn">Your Deck</button>
+        </div>
       </form>
       <div className="container">
         <FlashcardList flashcards={FlashCard} />
