@@ -1,0 +1,43 @@
+/* RegisterPage.css */
+
+.register-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /* Màu nền Gradient tím nhạt hiện đại (thay vì màu xám cũ) */
+  background: linear-gradient(135deg, #F9F9FF 0%, #E1E1FA 100%); 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+}
+
+.register-card {
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 16px; /* Bo góc tròn hơn một chút */
+  box-shadow: 0 15px 35px rgba(108, 92, 231, 0.15); /* Đổ bóng màu tím nhẹ */
+  width: 100%;
+  max-width: 550px; /* Tăng chiều rộng để chứa 2 cột thoải mái hơn */
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* --- PHẦN MỚI THÊM: ĐỂ CHIA HÀNG NGANG --- */
+.form-row {
+  display: flex;
+  gap: 15px; /* Khoảng cách giữa First Name và Last Name */
+  width: 100%;
+}
+
+/* Đảm bảo các form-group con bên trong chiếm đều diện tích */
+.form-row .form-group {
+  flex: 1; 
+  width: 100%;
+}
+
+/* Responsive: Trên điện thoại thì tự động xuống dòng lại như cũ */
+@media (max-width: 480px) {
+  .form-row {
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+}

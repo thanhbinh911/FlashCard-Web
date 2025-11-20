@@ -1,21 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import './style/RegisterPage.css'; 
 
-// Define the type for the authentication response from the backend.
 interface AuthResponse {
   token: string;
   username: string;
 }
 
-/**
- * The Register component provides a form for new users to create an account.
- * On successful registration, it stores the authentication token, shows a success message,
- * and navigates the user to the login page.
- */
 function Register() {
   const navigate = useNavigate();
   
-  // State for all the required registration form fields.
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [username, setUsername] = React.useState('');
@@ -23,103 +17,111 @@ function Register() {
   const [password, setPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
 
-  /**
-   * Handles the form submission for the registration process.
-   * It validates the password confirmation and sends a POST request to the backend's register endpoint.
-   * @param e - The form event.
-   */
   const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    // Handle registration logic here
+    e.preventDefault();
+    if(password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+    
     fetch('http://localhost:8080/api/auth/register', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        firstName, // <-- Required by backend
-        lastName,  // <-- Required by backend
-        username,
-        email,
-        password
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firstName, lastName, username, email, password })
     })
     .then(async (response) => {
-      if (response.ok) {
-        // If the response is successful, parse the JSON body.
-        return response.json() as Promise<AuthResponse>;
-      } else {
-        // If there's an error, try to read the error message from the backend.
+      if (response.ok) return response.json() as Promise<AuthResponse>;
+      else {
         const errorText = await response.text(); 
         throw new Error(`Registration failed (${response.status}): ${errorText}`);
       }
     })
     .then(data => {
-      // On successful registration, store the token and notify the user.
-      console.log('Registration successful:', data.token);
       localStorage.setItem('token', data.token);
       alert("Registration successful!");
-      navigate('/'); // Redirect to the Login page.
+      navigate('/'); 
     })
     .catch((error) => {
-      // Log and display any errors that occurred during the registration process.
-      console.error('Error during registration:', error);
       alert(error.message); 
     });
   }
 
-  // Render the registration form.
   return (
-    <div className="register-container" style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
-      <h2>Register Page</h2>
-      <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    <div className="register-page">
+      <div className="register-card">
+        <h2 className="login-title">Create Account</h2>
         
-        {/* First Name input field */}
-        <div>
-          <label htmlFor="firstName">First Name</label>
-          <input 
-            type="text" id="firstName" required 
-            value={firstName} onChange={(e) => setFirstName(e.target.value)} 
-            style={{ width: '100%' }}
-          />
-        </div>
+        <form onSubmit={handleRegister} className="auth-form">
+          
+          {/* Sử dụng class form-row thay vì style inline để ăn khớp với CSS responsive */}
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="firstName" className="form-label">First Name</label>
+              <input 
+                type="text" id="firstName" required 
+                className="form-input"
+                placeholder="First Name"
+                value={firstName} onChange={(e) => setFirstName(e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="lastName" className="form-label">Last Name</label>
+              <input 
+                type="text" id="lastName" required
+                className="form-input"
+                placeholder="Last Name"
+                value={lastName} onChange={(e) => setLastName(e.target.value)} 
+              />
+            </div>
+          </div>
 
-        {/* Last Name input field */}
-        <div>
-          <label htmlFor="lastName">Last Name</label>
-          <input 
-            type="text" id="lastName" required
-            value={lastName} onChange={(e) => setLastName(e.target.value)} 
-            style={{ width: '100%' }}
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="username" className="form-label">Username</label>
+            <input 
+              type="text" id="username" required 
+              className="form-input" 
+              placeholder="Enter your username"
+              value={username} onChange={(e) => setUsername(e.target.value)} 
+            />
+          </div>
 
-        {/* Username input field */}
-        <div>
-          <label htmlFor="username">Username</label>
-          <input type="text" id="username" required value={username} onChange={(e) => setUsername(e.target.value)} style={{ width: '100%' }} />
-        </div>
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">Email</label>
+            <input 
+              type="email" id="email" required 
+              className="form-input" 
+              placeholder="name@example.com"
+              value={email} onChange={(e) => setEmail(e.target.value)} 
+            />
+          </div>
 
-        {/* Email input field */}
-        <div>
-          <label htmlFor="email">Email</label>
-          <input type="email" id="email" required value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: '100%' }} />
-        </div>
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">Password</label>
+            <input 
+              type="password" id="password" required 
+              className="form-input" 
+              placeholder="••••••••"
+              value={password} onChange={(e) => setPassword(e.target.value)} 
+            />
+          </div>
 
-        {/* Password input field */}
-        <div>
-          <label htmlFor="password">Password</label>
-          <input type="password" id="password" required value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: '100%' }} />
-        </div>
+          <div className="form-group">
+            <label htmlFor="confirm-password" className="form-label">Confirm Password</label>
+            <input 
+              type="password" id="confirm-password" required 
+              className="form-input" 
+              placeholder="••••••••"
+              value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} 
+            />
+          </div>
 
-        {/* Confirm Password input field */}
-        <div>
-          <label htmlFor="confirm-password">Confirm Password</label>
-          <input type="password" id="confirm-password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={{ width: '100%' }} />
-        </div>
-
-        <button type="submit" style={{ marginTop: '10px', padding: '10px' }}>Register</button>
-      </form>
+          <button type="submit" className="btn-primary">Sign Up</button>
+          
+          <div className="auth-link">
+            Already have an account? <a href="/">Login</a>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
