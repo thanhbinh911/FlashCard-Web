@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import org.springframework.security.config.Customizer;
 
+
 /**
  * This class configures the security settings for the application, including authentication and authorization.
  * It enables web security and defines rules for accessing different parts of the application.
@@ -75,4 +76,7 @@ public class SecurityConfig {
         // Build and return the configured SecurityFilterChain
         return http.build();
     }
+
+    
+
 }
