@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react"
 import FlashcardList from "./FlashcardList"
 import './style/App.css'
 import axios from "axios"
+import { useNavigate } from "react-router-dom"
 
 function FlashcardPage() {
+  const navigate = useNavigate()
 
   const [FlashCard, setFlashCard] = useState([])
   const [categories, setCategories] = useState<Array<{id: number, name: string}>>([])
@@ -71,7 +73,7 @@ useEffect(() => {
   return (
     <>
       <form className="header" onSubmit={handleSubmit}>
-        <button className="To-Login-Btn" onClick={backToLogin}>To Login</button>
+        <button className="To-Login-Btn" onClick={() => navigate('/')}>To Login</button>
         <div className="form-group">
           <label htmlFor="category">Category</label>
           <select id="category" value={category} onChange={e => setCategory(e.target.value)}>
@@ -92,10 +94,10 @@ useEffect(() => {
           </button>
         </div>
         <div className="form-group">
-          <button className="btn">Create Deck</button>
+          <button className="btn" onClick={() => navigate('create-deck')}>Create Deck</button>
         </div>
         <div>
-          <button className="btn">Your Deck</button>
+          <button className="btn" onClick={() => navigate('your-deck')}>Your Deck</button>
         </div>
       </form>
       <div className="container">
@@ -103,10 +105,6 @@ useEffect(() => {
       </div>
     </>
   )
-}
-
-function backToLogin() {
-  window.location.href = '/'
 }
 
 function decodeString(str: string) {
