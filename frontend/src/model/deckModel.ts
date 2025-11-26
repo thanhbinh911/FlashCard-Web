@@ -1,4 +1,4 @@
-export interface Deck {
+export interface deck {
   id: number
   title: string
 }
