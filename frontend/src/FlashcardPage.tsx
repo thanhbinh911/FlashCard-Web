@@ -94,10 +94,10 @@ useEffect(() => {
           </button>
         </div>
         <div className="form-group">
-          <button className="btn" onClick={() => navigate('create-deck')}>Create Deck</button>
+          <button className="btn" onClick={() => navigate('/create-deck')}>Create Deck</button>
         </div>
         <div>
-          <button className="btn" onClick={() => navigate('your-deck')}>Your Deck</button>
+          <button className="btn" onClick={() => navigate('/your-deck')}>Your Deck</button>
         </div>
       </form>
       <div className="container">

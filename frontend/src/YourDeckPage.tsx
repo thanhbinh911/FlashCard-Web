@@ -71,7 +71,7 @@ function YourDeckPage() {
             onChange={(e) => setOptions3(e.target.value)}
             required
             placeholder="Enter card options"
-          />
+          />-
           <input
             type="text"
             id="cardOptions4"
