@@ -85,7 +85,7 @@ useEffect(() => {
         </div>
         <div className="form-group">
           <label htmlFor="amount">Number Of Questions</label>
-          <input type="number" id="amount" min="1" step="1" value={amount} defaultValue={10} onChange={e => 
+          <input type="number" id="amount" min="1" step="1" value={amount} onChange={e => 
             setAmount(Number(e.target.value))} />
         </div>
         <div className="form-group">
