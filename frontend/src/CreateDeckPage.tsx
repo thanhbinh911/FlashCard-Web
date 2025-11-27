@@ -26,7 +26,7 @@ function CreateDeckPage() {
             placeholder="Enter deck title"
           />
         </div>
-        <button className="btn" type="submit" onClick={() => navigate('/your-deck')}>
+        <button className="btn" onClick={() => navigate('/your-deck')}>
           Create Deck</button>
       </form>
     </div>

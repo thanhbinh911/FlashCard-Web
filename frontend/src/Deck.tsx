@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import type { Deck } from './model/deckModel'
+import type { deck} from './model/deckModel'
 
 interface DeckProps {
-  deck: Deck
+  deck: deck
 }
 
 const Deck = ( {deck} : DeckProps) => {
@@ -26,7 +26,11 @@ const Deck = ( {deck} : DeckProps) => {
     <div 
       className={`deck ${click ? 'clicked' : ''}`} 
       style={{height: height}}
-      onClick={() => setClick(!click)}
+      onClick={() => {
+        setClick(!click)
+        console.log(`Deck clicked: ${click}`)
+        }
+      }
       ref={deckEl}
     >
       <h2>{deck.title}</h2>
@@ -34,6 +38,7 @@ const Deck = ( {deck} : DeckProps) => {
     </div>
   )
 }
+
 
 export default Deck
 
