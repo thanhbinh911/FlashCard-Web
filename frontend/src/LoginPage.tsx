@@ -23,7 +23,7 @@ function Login() {
       if (response.ok) return response.json() as Promise<AuthResponse>;
       else {
         const errorText = await response.text();
-        throw new Error('Login failed: ' + response.status + ' ' + errorText);
+        throw new Error('Login failed: ' + response.status + ' ' + errorText + '\nUsername or password may be incorrect.');
       }
     })
     .then(data => {
