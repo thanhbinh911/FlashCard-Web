@@ -29,6 +29,9 @@ public class UserEntity {
     @Column(name = "password_hash", nullable = false, length = 255)
     private String password;
 
+    @Column(name = "role", nullable = false) 
+    private String role;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeckEntity> decks;
 
@@ -88,5 +91,13 @@ public class UserEntity {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+    
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
