@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import Deck from './Deck'
 import type { deck } from './model/deckModel'
 import './style/YourDeck.css'
 import DecksList from './DecksList'

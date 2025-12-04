@@ -5,6 +5,8 @@ import Login from "./LoginPage"
 import Register from "./RegisterPage"
 import CreateDeckPage from "./CreateDeckPage"
 import YourDeckPage from "./YourDeckPage"
+import DeckPage from "./DeckPage"
+import AddCardPage from "./AddCardPage"
 
 function App() {
   return (
@@ -14,6 +16,9 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/create-deck" element={<CreateDeckPage />} />
       <Route path="/your-deck" element={<YourDeckPage />} />
+      <Route path="/decks/:deckId" element={
+        <DeckPage deckId={Number(window.location.pathname.split('/').pop())} />} />
+      <Route path="/decks/:deckId/add-flashcard" element={<AddCardPage deckId={Number(window.location.pathname.split('/').slice(-2, -1)[0])} />} />
     </Routes>
   )
 }

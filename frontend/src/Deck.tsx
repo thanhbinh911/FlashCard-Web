@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import type { deck} from './model/deckModel'
+import { useNavigate } from 'react-router-dom'
 
 interface DeckProps {
   deck: deck
 }
 
 const Deck = ( {deck} : DeckProps) => {
-
-  const [click, setClick] = React.useState(false)
+  const navigate = useNavigate()
   const [height, setHeight] = useState<number>(100)
 
   const deckEl = React.useRef<HTMLDivElement | null>(null)
@@ -24,17 +24,14 @@ const Deck = ( {deck} : DeckProps) => {
 
   return (
     <div 
-      className={`deck ${click ? 'clicked' : ''}`} 
+      className="deck" 
       style={{height: height}}
       onClick={() => {
-        setClick(!click)
-        console.log(`Deck clicked: ${click}`)
-        }
-      }
+          navigate(`/decks/${deck.id}`)
+      }}
       ref={deckEl}
     >
       <h2>{deck.title}</h2>
-      
     </div>
   )
 }

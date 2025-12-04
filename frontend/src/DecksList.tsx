@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import type { deck } from './model/deckModel'
 import Deck from './Deck'
 
