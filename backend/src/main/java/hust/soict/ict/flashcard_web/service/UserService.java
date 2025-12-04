@@ -60,6 +60,8 @@ public class UserService implements UserDetailsService {
         newUser.setLastName(request.getLastName());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
 
+        newUser.setRole("USER");
+
         UserEntity savedUser = userRepository.save(newUser);
 
         return new CustomUserDetails(savedUser);

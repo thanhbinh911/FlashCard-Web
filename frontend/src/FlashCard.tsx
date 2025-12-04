@@ -1,49 +1,43 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import type { Flashcard } from './model/cardModel'
 
+// Props: a single flashcard item to display
 interface FlashCardProps {
   flashcard: Flashcard
 }
 
 const FlashCard = ({ flashcard }: FlashCardProps) => {
-
+  // Local state: whether the card is flipped to show the answer
   const [flip, setFlip] = React.useState(false)
-  const [height, setHeight] = React.useState<number>(100)
-
-
-
-  const frontEl = useRef<HTMLDivElement | null>(null)
-  const backEl = useRef<HTMLDivElement | null>(null)
-
-
-  function setMaxHeight() {
-    const frontHeight = frontEl.current?.getBoundingClientRect().height
-    const backHeight = backEl.current?.getBoundingClientRect().height
-    setHeight(Math.max(frontHeight || 0, backHeight || 0, 100))
-  }
-
-  useEffect(() => {
-    setMaxHeight()
-  }, [flashcard.question, flashcard.answer, flashcard.options])
-  useEffect(() => {
-    window.addEventListener('resize', setMaxHeight)
-    return () => window.removeEventListener('resize', setMaxHeight)
-  }, [])
 
   return (
-    <div
-      className={`card ${flip ? 'flip' : ''}`}
-      style={{ height: height }}
+    // Card container: toggles flip on click
+    <div 
+      className={`card ${flip ? 'flip' : ''}`} 
       onClick={() => setFlip(!flip)}
     >
-      <div className='front' ref={frontEl}>
-        <h2>{flashcard.question}</h2>
-        <div className='flashcard-options'>
-          {flashcard.options.map((option,index) => 
-            <p className='card-option' key={`card${index}`}>{option}</p>)}
+      <div className="card-inner">
+
+        {/* Front face: question and options */}
+        <div className="card-front">
+          <div className="card-content">
+            <h3>{flashcard.question}</h3>
+            <div className="flashcard-options">
+              {flashcard.options.map((option, index) => 
+                <div className="card-option" key={index}>{option}</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+
+        {/* Back face: correct answer */}
+        <div className="card-back">
+          <div className="card-content">
+            {flashcard.answer}
+          </div>
         </div>
       </div>
-      <div className='back' ref={backEl}>{flashcard.answer}</div>
     </div>
   )
 }
