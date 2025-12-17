@@ -35,7 +35,7 @@ function DeckPage() {
         id: item.id,
         question: item.questionText,
         answer: item.answerText,
-        options: []
+        options: [`hint: ${item.hint}`]
       }))
       setFlashcards(results)
       console.log(flashcards)
@@ -48,7 +48,7 @@ function DeckPage() {
   return (
     <div className={`deck-${id} deck-page`}>
       <h2>{deckTitle}</h2>
-      <button className='add-card' onClick={() => navigate(`/decks/${id}/add-flashcard`)}>Add Flashcard</button>
+      <button className='add-card' onClick={() => navigate(`/decks/${id}/${deckTitle}/add-flashcard`)}>Add Flashcard</button>
       <button className='back-to-your-deck' onClick={() => navigate('/your-deck')}>Back to Your Decks</button>
       <FlashcardList flashcards={flashcards} />
     </div>
