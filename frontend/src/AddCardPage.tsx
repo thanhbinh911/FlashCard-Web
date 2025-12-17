@@ -1,31 +1,41 @@
-import React, { use } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom';
 
-function AddCardPage( {deckId}: {deckId: number} ) {
+function AddCardPage( ) {
   const navigate = useNavigate()
-  const [question, setQuestion] = React.useState('');
-  const [answer, setAnswer] = React.useState('');
-  const [hint, setHint] = React.useState('');
+  const [questionText, setQuestion] = React.useState('');
+  const [answerText, setAnswer] = React.useState('');
+  const [hint, setHint] = React.useState('')
+  const { deckId } = useParams()
+  
+
+  useEffect(() => {
+    // Check if user is authenticated
+    console.log(`${deckId}`)
+    console.log(localStorage.getItem('token'))
+  }, [])
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     // Logic to add the flashcard goes here
-    fetch(`http://localhost:5000/decks/${deckId}/flashcards`, {
+    fetch(`http://localhost:8080/api/decks/${deckId}/flashcards`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
-      body: JSON.stringify({ question, answer, hint })
+      body: JSON.stringify({ questionText, answerText, hint })
     })
     .then(response => {
       if (response.ok) {
-        setQuestion('');
-        setAnswer('');
-        setHint('');
+        console.log('Flashcard added successfully')
+        setQuestion('')
+        setAnswer('')
+        setHint('')
       } else {
         // Handle error
-        console.error('Failed to add flashcard');
+        console.log(JSON.stringify({ questionText, answerText, hint }))
+        console.error('Failed to add flashcard')
       }
     })
     .catch(error => {
@@ -44,7 +54,7 @@ function AddCardPage( {deckId}: {deckId: number} ) {
             id="question" 
             className="question" 
             required 
-            value={question} 
+            value={questionText } 
             onChange={e => setQuestion(e.target.value)} 
             placeholder='Type your question here'
           />
@@ -56,7 +66,7 @@ function AddCardPage( {deckId}: {deckId: number} ) {
           id="answer" 
           className="answer" 
           required 
-          value={answer} 
+          value={answerText} 
           onChange={e => setAnswer(e.target.value)} 
           placeholder='Type the answer here'  
         />
@@ -74,6 +84,7 @@ function AddCardPage( {deckId}: {deckId: number} ) {
         </div>
         <button type="submit">Add Flashcard</button>
         <button className='back-to-deck' onClick={() => navigate(`/decks/${deckId}`)}>Back to Deck</button>
+        <button className='back-to-home' onClick={() => navigate('/flashcards')}>Back to Home</button>
       </form>
     </div>
   )

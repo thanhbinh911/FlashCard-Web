@@ -16,9 +16,8 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/create-deck" element={<CreateDeckPage />} />
       <Route path="/your-deck" element={<YourDeckPage />} />
-      <Route path="/decks/:deckId" element={
-        <DeckPage deckId={Number(window.location.pathname.split('/').pop())} />} />
-      <Route path="/decks/:deckId/add-flashcard" element={<AddCardPage deckId={Number(window.location.pathname.split('/').slice(-2, -1)[0])} />} />
+      <Route path="/decks/:deckId" element={<DeckPage  />} />
+      <Route path="/decks/:deckId/add-flashcard" element={<AddCardPage  />} />
     </Routes>
   )
 }
