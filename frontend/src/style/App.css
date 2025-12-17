@@ -437,3 +437,69 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+/* --- Add Flashcard Page Specific Styles --- */
+
+.form-card {
+  max-width: 600px;
+  margin: 0 auto; 
+  background-color: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(52, 152, 219, 0.1);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.form-actions button {
+  flex: 1; 
+}
+
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #c3e6cb;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Deck Page Specific Styles --- */
+
+.deck-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 600px) {
+  .deck-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .deck-controls button {
+    width: 100%;
+  }
+}

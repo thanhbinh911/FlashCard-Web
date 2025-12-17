@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react'
 import FlashcardList from './FlashcardList'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router-dom' 
 import type { Flashcard } from './model/cardModel'
 
 function DeckPage() {
   const navigate = useNavigate()
-
-  const {deckTitle} = useParams()
-  const { deckId } = useParams()
+  const { deckTitle, deckId } = useParams()
   const id = Number(deckId)
+  
+
   const [flashcards, setFlashcards] = useState<Flashcard[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    console.log(`${id}`)
+    setIsLoading(true)
+    
     fetch(`http://localhost:8080/api/decks/${id}/flashcards`, {
       method: 'GET',
       headers: {
@@ -23,34 +25,72 @@ function DeckPage() {
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok')
-      } else {
-        console.log('Fetch successful')
       }
       return response.json()
     })
     .then(data => {
-      // Handle the fetched flashcards data
-      console.log('Fetched flashcards:', data)
+    
       const results = data.map((item: any) => ({
         id: item.id,
         question: item.questionText,
         answer: item.answerText,
-        options: [`hint: ${item.hint}`]
+        
+        options: item.hint ? [`Hint: ${item.hint}`] : [] 
       }))
       setFlashcards(results)
-      console.log(flashcards)
     })
     .catch(error => {
       console.error('Error fetching flashcards:', error)
     })
-  }, [])
+    .finally(() => {
+   
+      setIsLoading(false)
+    })
+  }, [id]) 
 
   return (
-    <div className={`deck-${id} deck-page`}>
-      <h2>{deckTitle}</h2>
-      <button className='add-card' onClick={() => navigate(`/decks/${id}/${deckTitle}/add-flashcard`)}>Add Flashcard</button>
-      <button className='back-to-your-deck' onClick={() => navigate('/your-deck')}>Back to Your Decks</button>
-      <FlashcardList flashcards={flashcards} />
+    <div className="container">
+      
+      <h2 className="page-title">
+        Reviewing: <span style={{ color: 'var(--primary)' }}>{deckTitle}</span>
+      </h2>
+
+      
+      <div className="deck-controls">
+        <button 
+          className="btn btn-outline" 
+          onClick={() => navigate('/your-deck')}
+        >
+          ← Back to Decks
+        </button>
+
+        <button 
+          className="btn" 
+          onClick={() => navigate(`/decks/${id}/${deckTitle}/add-flashcard`)}
+        >
+          + Add Flashcard
+        </button>
+      </div>
+
+    
+      
+
+      {isLoading && (
+        <div className="loader-container">
+          <div className="spinner"></div>
+        </div>
+      )}
+
+      {!isLoading && flashcards.length === 0 && (
+        <div className="empty-state">
+          <h3>No flashcards found in this deck.</h3>
+          <p>Click "Add Flashcard" to get started!</p>
+        </div>
+      )}
+
+      {!isLoading && flashcards.length > 0 && (
+        <FlashcardList flashcards={flashcards} />
+      )}
     </div>
   )
 }
