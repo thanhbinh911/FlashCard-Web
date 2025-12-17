@@ -1,7 +1,7 @@
 
 import type { deck } from './model/deckModel'
 import { FaBook, FaArrowRight } from 'react-icons/fa'
-//import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 // Props: a single deck instance to render
 interface DeckProps {
@@ -9,12 +9,11 @@ interface DeckProps {
 }
 
 const Deck = ({ deck }: DeckProps) => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   // Handle card click: navigate to deck details (currently logs id)
   const handleClick = () => {
-    // navigate(`/decks/${deck.id}`) 
-    console.log("Clicked deck:", deck.id)
+    navigate(`/decks/${deck.id}`) 
   }
 
   return (
