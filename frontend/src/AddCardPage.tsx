@@ -7,6 +7,7 @@ function AddCardPage( ) {
   const [answerText, setAnswer] = React.useState('');
   const [hint, setHint] = React.useState('')
   const { deckId } = useParams()
+  const {deckTitle} = useParams()
   
 
   useEffect(() => {
@@ -83,7 +84,7 @@ function AddCardPage( ) {
         />
         </div>
         <button type="submit">Add Flashcard</button>
-        <button className='back-to-deck' onClick={() => navigate(`/decks/${deckId}`)}>Back to Deck</button>
+        <button className='back-to-deck' onClick={() => navigate(`/decks/${deckId}/${deckTitle}`)}>Back to Deck</button>
         <button className='back-to-home' onClick={() => navigate('/flashcards')}>Back to Home</button>
       </form>
     </div>

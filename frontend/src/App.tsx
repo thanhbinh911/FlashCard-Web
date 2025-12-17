@@ -16,8 +16,8 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/create-deck" element={<CreateDeckPage />} />
       <Route path="/your-deck" element={<YourDeckPage />} />
-      <Route path="/decks/:deckId" element={<DeckPage  />} />
-      <Route path="/decks/:deckId/add-flashcard" element={<AddCardPage  />} />
+      <Route path="/decks/:deckId/:deckTitle" element={<DeckPage  />} />
+      <Route path="/decks/:deckId/:deckTitle/add-flashcard" element={<AddCardPage  />} />
     </Routes>
   )
 }

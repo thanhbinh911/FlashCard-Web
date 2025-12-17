@@ -13,7 +13,7 @@ const Deck = ({ deck }: DeckProps) => {
 
   // Handle card click: navigate to deck details (currently logs id)
   const handleClick = () => {
-    navigate(`/decks/${deck.id}`) 
+    navigate(`/decks/${deck.id}/${deck.title}`); 
   }
 
   return (

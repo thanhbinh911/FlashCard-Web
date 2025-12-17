@@ -1,13 +1,15 @@
-import React, { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import FlashcardList from './FlashcardList'
 import { useNavigate, useParams } from 'react-router'
+import type { Flashcard } from './model/cardModel'
 
 function DeckPage() {
   const navigate = useNavigate()
 
-  const [Flashcards, setFlashCards] = useState([])
+  const {deckTitle} = useParams()
   const { deckId } = useParams()
   const id = Number(deckId)
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([])
 
   useEffect(() => {
     console.log(`${id}`)
@@ -28,7 +30,15 @@ function DeckPage() {
     })
     .then(data => {
       // Handle the fetched flashcards data
-      setFlashCards(data)
+      console.log('Fetched flashcards:', data)
+      const results = data.map((item: any) => ({
+        id: item.id,
+        question: item.questionText,
+        answer: item.answerText,
+        options: [`hint: ${item.hint}`]
+      }))
+      setFlashcards(results)
+      console.log(flashcards)
     })
     .catch(error => {
       console.error('Error fetching flashcards:', error)
@@ -37,10 +47,10 @@ function DeckPage() {
 
   return (
     <div className={`deck-${id} deck-page`}>
-      <h2>{`Deck ${id}`}</h2>
-      <button className='add-card' onClick={() => navigate(`/decks/${id}/add-flashcard`)}>Add Flashcard</button>
+      <h2>{deckTitle}</h2>
+      <button className='add-card' onClick={() => navigate(`/decks/${id}/${deckTitle}/add-flashcard`)}>Add Flashcard</button>
       <button className='back-to-your-deck' onClick={() => navigate('/your-deck')}>Back to Your Decks</button>
-      <FlashcardList flashcards={Flashcards} />
+      <FlashcardList flashcards={flashcards} />
     </div>
   )
 }
