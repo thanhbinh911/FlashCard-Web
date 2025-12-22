@@ -1,11 +1,13 @@
 package hust.soict.ict.flashcard_web.security;
 
-import hust.soict.ict.flashcard_web.entity.UserEntity;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
+import hust.soict.ict.flashcard_web.entity.UserEntity;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -15,22 +17,35 @@ public class CustomUserDetails implements UserDetails {
         this.userEntity = userEntity;
     }
 
+    public Long getId() {
+        return userEntity.getId();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        return Collections.emptyList();
+        String roleName = userEntity.getRole() == null ? "USER": userEntity.getRole().name();
+        if (!roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
+        }
+        return List.of(new SimpleGrantedAuthority(roleName));
     }
 
     @Override
     public String getPassword() {
-
         return userEntity.getPassword();
     }
 
     @Override
     public String getUsername() {
-
+        // Returns email for Spring Security (used as JWT subject and for authentication)
         return userEntity.getEmail();
+    }
+
+    /**
+     * Returns the actual username (display name).
+     */
+    public String getActualUsername() {
+        return userEntity.getUsername();
     }
 
 

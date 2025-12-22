@@ -1,25 +1,29 @@
 package hust.soict.ict.flashcard_web.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "VGhpcyBJcyBBIEJlYXV0aWZ1bCBTZWNyZXQgS2V5IEZvciBKYXNvbiBXZWIgVG9rZW4gMjU2Yml0cw==";
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-
-    private static final long JWT_EXPIRATION_MS = 1000 * 60 * 60 * 24;
+    @Value("${jwt.expiration:86400000}") 
+    private long jwtExpirationMs;
 
 
     public String extractUsername(String token) {
@@ -43,7 +47,7 @@ public class JwtService {
                 .claims(extraClaims)
                 .subject(userDetails.getUsername()) 
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_MS))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSignInKey(), Jwts.SIG.HS256) 
                 .compact();
     }
@@ -75,7 +79,7 @@ public class JwtService {
 
 
     private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
