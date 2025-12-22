@@ -1,56 +1,30 @@
 package hust.soict.ict.flashcard_web.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+
 import hust.soict.ict.flashcard_web.dto.FlashcardRequest;
 import hust.soict.ict.flashcard_web.dto.FlashcardResponse;
 import hust.soict.ict.flashcard_web.entity.DeckEntity;
 import hust.soict.ict.flashcard_web.entity.FlashcardEntity;
-import hust.soict.ict.flashcard_web.entity.UserEntity;
+import hust.soict.ict.flashcard_web.exception.ResourceNotFoundException;
 import hust.soict.ict.flashcard_web.repository.DeckRepository;
 import hust.soict.ict.flashcard_web.repository.FlashcardRepository;
-import hust.soict.ict.flashcard_web.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FlashcardService {
 
-    @Autowired
-    private FlashcardRepository flashcardRepository;
+    private final FlashcardRepository flashcardRepository;
+    private final DeckRepository deckRepository;
+    private final DeckService deckService;
 
-    @Autowired
-    private DeckRepository deckRepository;
-
-    @Autowired
-    private UserRepository userRepository; 
-
-
-    private UserEntity getCurrentAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
-            throw new RuntimeException("Người dùng chưa được xác thực.");
-        }
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
-        return userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với email: " + userEmail));
-    }
-
-
-    private void checkDeckOwnership(DeckEntity deck, UserEntity user) {
-        if (!deck.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Bạn không có quyền truy cập hoặc chỉnh sửa Deck này.");
-        }
-    }
-
-    private void checkFlashcardOwnership(FlashcardEntity flashcard, UserEntity user) {
-
-        checkDeckOwnership(flashcard.getDeck(), user);
+    public FlashcardService(FlashcardRepository flashcardRepository, DeckRepository deckRepository, DeckService deckService) {
+        this.flashcardRepository = flashcardRepository;
+        this.deckRepository = deckRepository;
+        this.deckService = deckService;
     }
 
     private FlashcardResponse convertToResponse(FlashcardEntity entity) {
@@ -62,68 +36,78 @@ public class FlashcardService {
         );
     }
 
+    /**
+     * Validate that a flashcard belongs to the specified deck.
+     * Throws ResourceNotFoundException if flashcard doesn't exist or doesn't belong to deck.
+     * reusable private helper 
+     * 
+     */
+    private FlashcardEntity getFlashcardInDeck(Long deckId, Long flashcardId) {
+        FlashcardEntity flashcard = flashcardRepository.findById(flashcardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found"));
+        
+        if (!flashcard.getDeck().getId().equals(deckId)) {
+            throw new ResourceNotFoundException("Flashcard does not belong to the specified deck");
+        }
+        
+        return flashcard;
+    }
 
-    public List<FlashcardResponse> getFlashcardsByDeck(Long deckId) {
-        UserEntity currentUser = getCurrentAuthenticatedUser();
-        DeckEntity deck = deckRepository.findById(deckId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Deck với ID: " + deckId));
+    public List<FlashcardResponse> getFlashcardsByDeck(Long deckId, Authentication authentication) {
+        // Check read access to deck
+        deckService.checkReadAccess(deckId, authentication);
 
-
-        checkDeckOwnership(deck, currentUser);
-
-
-        return flashcardRepository.findByDeck_Id(deckId)
-                .stream()
+        return flashcardRepository.findByDeck_Id(deckId).stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
-    public FlashcardResponse createFlashcard(Long deckId, FlashcardRequest request) {
-        UserEntity currentUser = getCurrentAuthenticatedUser();
-        DeckEntity parentDeck = deckRepository.findById(deckId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Deck với ID: " + deckId));
-
-
-        checkDeckOwnership(parentDeck, currentUser);
-
-
-        FlashcardEntity newFlashcard = new FlashcardEntity();
-        newFlashcard.setQuestion(request.getQuestionText());
-        newFlashcard.setAnswer(request.getAnswerText());
-        newFlashcard.setHint(request.getHint());
-        newFlashcard.setDeck(parentDeck);
-
-        FlashcardEntity savedFlashcard = flashcardRepository.save(newFlashcard);
-        return convertToResponse(savedFlashcard);
-    }
-
-
-    public FlashcardResponse updateFlashcard(Long flashcardId, FlashcardRequest request) {
-        UserEntity currentUser = getCurrentAuthenticatedUser();
-        FlashcardEntity existingFlashcard = flashcardRepository.findById(flashcardId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Flashcard với ID: " + flashcardId));
-
-
-        checkFlashcardOwnership(existingFlashcard, currentUser);
-
-
-        existingFlashcard.setQuestion(request.getQuestionText());
-        existingFlashcard.setAnswer(request.getAnswerText());
-        existingFlashcard.setHint(request.getHint());
-
-        FlashcardEntity updatedFlashcard = flashcardRepository.save(existingFlashcard);
-        return convertToResponse(updatedFlashcard);
-    }
-
-    public void deleteFlashcard(Long flashcardId) {
-        UserEntity currentUser = getCurrentAuthenticatedUser();
-        FlashcardEntity flashcardToDelete = flashcardRepository.findById(flashcardId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Flashcard với ID: " + flashcardId));
-
-
-        checkFlashcardOwnership(flashcardToDelete, currentUser);
+    public FlashcardResponse getFlashcardById(Long deckId, Long flashcardId, Authentication authentication) {
+        // Check read access to deck
+        deckService.checkReadAccess(deckId, authentication);
         
+        // Get flashcard and validate it belongs to the deck
+        FlashcardEntity flashcard = getFlashcardInDeck(deckId, flashcardId);
+        
+        return convertToResponse(flashcard);
+    }
 
-        flashcardRepository.delete(flashcardToDelete);
+    
+
+    public FlashcardResponse createFlashcard(Long deckId, FlashcardRequest request, Authentication authentication) {
+        deckService.checkWriteAccess(deckId, authentication);
+
+        DeckEntity deck = deckRepository.findById(deckId)
+                .orElseThrow(() -> new ResourceNotFoundException("Deck not found"));
+
+        FlashcardEntity flashcard = new FlashcardEntity();
+        flashcard.setQuestion(request.getQuestionText());
+        flashcard.setAnswer(request.getAnswerText());
+        flashcard.setHint(request.getHint());
+        flashcard.setDeck(deck);
+
+        return convertToResponse(flashcardRepository.save(flashcard));
+    }
+
+    public FlashcardResponse updateFlashcard(Long deckId, Long flashcardId, FlashcardRequest request, Authentication authentication) {
+        deckService.checkWriteAccess(deckId, authentication);
+        
+        // Get flashcard and validate it belongs to the deck
+        FlashcardEntity flashcard = getFlashcardInDeck(deckId, flashcardId);
+
+        flashcard.setQuestion(request.getQuestionText());
+        flashcard.setAnswer(request.getAnswerText());
+        flashcard.setHint(request.getHint());
+
+        return convertToResponse(flashcardRepository.save(flashcard));
+    }
+
+    public void deleteFlashcard(Long deckId, Long flashcardId, Authentication authentication) {
+        deckService.checkWriteAccess(deckId, authentication);
+        
+        // Get flashcard and validate it belongs to the deck
+        FlashcardEntity flashcard = getFlashcardInDeck(deckId, flashcardId);
+
+        flashcardRepository.delete(flashcard);
     }
 }
