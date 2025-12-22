@@ -2,35 +2,23 @@ package hust.soict.ict.flashcard_web.entity;
 
 import java.io.Serializable;
 import java.util.Objects;
-import jakarta.persistence.*;
 
+import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Embeddable
 public class UserAchievementId implements Serializable {
     private Long userId;
     private Long achievementId;
 
-    public UserAchievementId() {
-    }
-
-    public UserAchievementId(Long userId, Long achievementId) {
-        this.userId = userId;
-        this.achievementId = achievementId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getAchievementId() {
-        return achievementId;
-    }
-    public void setAchievementId(Long achievementId) {
-        this.achievementId = achievementId;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -46,5 +34,4 @@ public class UserAchievementId implements Serializable {
     public int hashCode() {
         return Objects.hash(userId, achievementId);
     }
-
 }

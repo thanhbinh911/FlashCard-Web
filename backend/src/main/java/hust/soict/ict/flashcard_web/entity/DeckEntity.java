@@ -1,9 +1,25 @@
 package hust.soict.ict.flashcard_web.entity;
 
-import jakarta.persistence.*;
-import java.util.List;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "decks")
 public class DeckEntity {
@@ -23,58 +39,20 @@ public class DeckEntity {
     @OneToMany(mappedBy =  "reportedDeck", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReportEntity> reports;
 
+    @OneToMany(mappedBy = "deck", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeckCategoryEntity> deckCategories;
+
     @Column(name = "title", columnDefinition = "TEXT", nullable = false)
     private String title;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @org.hibernate.annotations.CreationTimestamp
     private LocalDateTime createdAt;
 
-    public DeckEntity() {}
-
-
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public UserEntity getUser() {
-        return user;
-    }
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-        public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-
-    public List<FlashcardEntity> getFlashcards () {
-        return flashcards;
-    }
-    public void setFlashcards (List<FlashcardEntity> flashcards) {
-        this.flashcards = flashcards;
-    }
+    @Column(name = "is_public", nullable = false)
+    private boolean isPublic;
 
 }

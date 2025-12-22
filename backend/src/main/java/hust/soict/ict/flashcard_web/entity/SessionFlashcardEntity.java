@@ -1,7 +1,13 @@
 package hust.soict.ict.flashcard_web.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "session_flashcards")
 public class SessionFlashcardEntity {
@@ -9,7 +15,6 @@ public class SessionFlashcardEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "session_flashcard_id")
     private Long id;
-
 
     @ManyToOne
     @JoinColumn(name = "session_id")
@@ -19,32 +24,12 @@ public class SessionFlashcardEntity {
     @JoinColumn(name = "flashcard_id")
     private FlashcardEntity flashcard;
 
-    public SessionFlashcardEntity() {
-    }
+    @Column(name = "position", nullable = false)
+    private Integer position = 1;
 
-//    public SessionFlashcardEntity(StudySessionEntity session, FlashcardEntity flashcard) {
-//        this.session = session;
-//        this.flashcard = flashcard;
-//    }
+    @Column(name = "user_answer", columnDefinition = "TEXT")
+    private String userAnswer;
 
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public StudySessionEntity getSession() {
-        return session;
-    }
-    public void setSession(StudySessionEntity session) {
-        this.session = session;
-    };
-
-    public FlashcardEntity getFlashcard() {
-        return flashcard;
-    }
-
-    public void setFlashcard(FlashcardEntity flashcard) {
-        this.flashcard = flashcard;
-    }
+    @Column(name = "correct", nullable = false)
+    private Boolean correct = false;
 }

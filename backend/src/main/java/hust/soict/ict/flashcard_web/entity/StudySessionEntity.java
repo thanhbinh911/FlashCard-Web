@@ -1,13 +1,40 @@
 package hust.soict.ict.flashcard_web.entity;
 
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "study_sessions")
 public class StudySessionEntity {
+
+    public enum SessionStatus {
+        IN_PROGRESS,
+        COMPLETED,
+        ABANDONED
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "session_id")
@@ -22,45 +49,37 @@ public class StudySessionEntity {
     private DeckEntity deck;
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SessionFlashcardEntity> sessionFlashcards;
+    private List<SessionFlashcardEntity> sessionFlashcards = new ArrayList<>();
 
-
-    @Column(name = "start_time", nullable = false, updatable = false, insertable = false)
+    @Setter(AccessLevel.NONE)
+    @Column(name = "start_time", nullable = false, updatable = false)
+    @org.hibernate.annotations.CreationTimestamp
     private LocalDateTime startedAt;
 
     @Column(name = "end_time")
     private LocalDateTime endedAt;
-    
-    public StudySessionEntity() {
-    }
 
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "total_cards")
+    private Integer totalCards;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public UserEntity getUser() {
-        return user;
-    }
+    @Column(name = "time_limit_seconds")
+    private Long timeLimitSeconds;
 
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
-    public DeckEntity getDeck() {
-        return deck;
-    }
-    public void setDeck(DeckEntity deck) {
-        this.deck = deck;
-    }
-    public LocalDateTime getStartedAt() {
-        return startedAt;
-    }
-    public LocalDateTime getEndedAt() {
-        return endedAt;
-    }
-    public void setEndedAt(LocalDateTime endedAt) {
-        this.endedAt = endedAt;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private SessionStatus status = SessionStatus.IN_PROGRESS;
+
+    @Column(name = "correct_answers_count")
+    private Integer correctAnswersCount = 0;
+
+    @Column(name = "is_practice_mode", nullable = false)
+    private Boolean isPracticeMode = false;
+
+    /**
+     * Session mode: "REGULAR", "MCQ", or "REVIEW"
+     * Uses Strategy Pattern for different study modes.
+     */
+    @Column(name = "session_mode", nullable = false)
+    private String sessionMode = "REGULAR";
+
 }
