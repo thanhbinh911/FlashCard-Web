@@ -10,4 +10,5 @@ import java.util.List;
 public interface FlashcardRepository extends JpaRepository<FlashcardEntity, Long> {
 
     List<FlashcardEntity> findByDeck_Id(Long deckId);
+    long countByDeck_Id(Long deckId);
 }
