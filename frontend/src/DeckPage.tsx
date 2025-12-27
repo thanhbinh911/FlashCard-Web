@@ -61,7 +61,7 @@ function DeckPage() {
           className="btn btn-outline" 
           onClick={() => navigate('/your-deck')}
         >
-          ← Back to Decks
+          ← Back to Library
         </button>
 
         <button 

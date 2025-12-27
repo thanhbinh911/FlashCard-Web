@@ -9,7 +9,6 @@ function FlashcardPage() {
   const [flashcards, setFlashcards] = useState([])
   // Available categories fetched from OpenTDB
   const [categories, setCategories] = useState<Array<{id: number, name: string}>>([])
-  
   // Form controls: selected category and desired quantity
   const [category, setCategory] = useState('')
   const [amount, setAmount] = useState(10)
