@@ -1,0 +1,25 @@
+# Database connection - placeholders only, safe to commit
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+spring.datasource.driver-class-name=com.postgresql.Driver
+
+# JPA / Hibernate settings
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=none
+
+# Server settings
+server.port=8080
+
+# JWT Configuration - Use a strong, unique secret in production!
+# Generate a Base64-encoded key with at least 256 bits (32+ bytes)
+jwt.secret=${JWT_SECRET}
+jwt.expiration=86400000
+
+# CORS Configuration - comma-separated list of allowed origins
+cors.allowed-origins=http://localhost:3000,http://localhost:5173
+
+# OpenAI API Configuration
+spring.ai.openai.api-key=${OPENAI_API_KEY}
+spring.ai.openai.chat.options.model=gpt-3.5-turbo
+spring.ai.openai.chat.options.temperature=0.7

@@ -1,16 +1,30 @@
 package hust.soict.ict.flashcard_web.entity;
-import jakarta.persistence.*;
+
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "flashcard_tags")
 public class FlashcardTagEntity {
+
     @EmbeddedId
-    @AttributeOverrides(
-            {
-             @AttributeOverride(name = "flashcardId", column = @Column(name = "flashcard_id")),
-                    @AttributeOverride(name = "tagId", column = @Column(name = "tag_id"))
-            }
-    )
+    @AttributeOverrides({
+        @AttributeOverride(name = "flashcardId", column = @Column(name = "flashcard_id")),
+        @AttributeOverride(name = "tagId", column = @Column(name = "tag_id"))
+    })
     private FlashcardTagId id = new FlashcardTagId();
 
     @ManyToOne
@@ -23,46 +37,8 @@ public class FlashcardTagEntity {
     @JoinColumn(name = "tag_id")
     private TagEntity tag;
 
-    public FlashcardTagEntity() {
-    }
-
     public FlashcardTagEntity(FlashcardEntity flashcard, TagEntity tag) {
         this.flashcard = flashcard;
         this.tag = tag;
-        Long flashcardId = (flashcard != null) ? flashcard.getId() : null;
-        Long tagId = (tag != null) ? tag.getId() : null;
-        this.id = new FlashcardTagId(flashcardId, tagId);
     }
-
-    public FlashcardTagId getId() {
-        return id;
-    }
-    public void setId(FlashcardTagId id) {
-        this.id = id;
-    }
-    public FlashcardEntity getFlashcard() {
-        return flashcard;
-    }
-    public void setFlashcard(FlashcardEntity flashcard) {
-        this.flashcard = flashcard;
-        if (flashcard != null) {
-                        Long flashcardId = flashcard.getId();
-            if (flashcardId != null) {
-                this.id.setFlashcardId(flashcardId);
-            }
-        }
-    }
-    public TagEntity getTag() {
-        return tag;
-    }
-    public void setTag(TagEntity tag) {
-        this.tag = tag;
-        if (tag != null) {
-            Long tagId = tag.getId();
-            if (tagId != null) {
-                this.id.setTagId(tagId);
-            }
-        }
-    }
-
 }

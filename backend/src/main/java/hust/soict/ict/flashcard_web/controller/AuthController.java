@@ -1,62 +1,52 @@
 package hust.soict.ict.flashcard_web.controller;
 
-import hust.soict.ict.flashcard_web.dto.AuthResponse;
-import hust.soict.ict.flashcard_web.dto.LoginRequest;
-import hust.soict.ict.flashcard_web.dto.RegisterRequest;
-import hust.soict.ict.flashcard_web.security.JwtService; 
-import hust.soict.ict.flashcard_web.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager; 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * This controller handles authentication-related requests, such as user registration and login.
- * It provides endpoints for users to create an account and obtain a JWT for accessing protected resources.
- */
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import hust.soict.ict.flashcard_web.dto.AuthResponse;
+import hust.soict.ict.flashcard_web.dto.ChangePasswordRequest;
+import hust.soict.ict.flashcard_web.dto.LoginRequest;
+import hust.soict.ict.flashcard_web.dto.MessageResponse;
+import hust.soict.ict.flashcard_web.dto.RegisterRequest;
+import hust.soict.ict.flashcard_web.security.CustomUserDetails;
+import hust.soict.ict.flashcard_web.security.JwtService;
+import hust.soict.ict.flashcard_web.service.UserService;
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtService jwtService;
-
-    /**
-     * Handles the user registration request.
-     * When a user signs up, this method creates a new user account and returns a JWT.
-     *
-     * @param request The registration request containing user details (username, email, password, etc.).
-     * @return A `ResponseEntity` containing an `AuthResponse` with the JWT and username.
-     */
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        // Register the new user using the UserService
-        UserDetails userDetails = userService.registerUser(request);
-        // Generate a JWT for the newly registered user
-        String token = jwtService.generateToken(userDetails);
-        // Return the token and username in the response
-        return ResponseEntity.ok(new AuthResponse(token, userDetails.getUsername()));
+    public AuthController(UserService userService, AuthenticationManager authenticationManager, JwtService jwtService) {
+        this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
-    /**
-     * Handles the user login request.
-     * It authenticates the user's credentials and, if successful, returns a JWT.
-     *
-     * @param request The login request containing the user's email and password.
-     * @return A `ResponseEntity` containing an `AuthResponse` with the JWT and username.
-     */
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        CustomUserDetails userDetails = userService.registerUser(request);
+        String token = generateTokenWithUserId(userDetails);
+        return ResponseEntity.ok(new AuthResponse(token, userDetails.getActualUsername()));
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        // Authenticate the user's credentials using the AuthenticationManager
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -64,13 +54,29 @@ public class AuthController {
                 )
         );
 
-        // Get the UserDetails from the authenticated principal
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        
+        // Update last login timestamp
+        userService.updateLastLogin(userDetails.getId());
+        
+        String token = generateTokenWithUserId(userDetails);
+        return ResponseEntity.ok(new AuthResponse(token, userDetails.getActualUsername()));
+    }
 
-        // Generate a JWT for the authenticated user
-        String token = jwtService.generateToken(userDetails);
+    @PutMapping("/password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<MessageResponse> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        userService.changePassword(userDetails.getId(), request);
+        return ResponseEntity.ok(new MessageResponse("Password changed successfully"));
+    }
 
-        // Return the token and username in the response
-        return ResponseEntity.ok(new AuthResponse(token, userDetails.getUsername()));
+    private String generateTokenWithUserId(CustomUserDetails userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", userDetails.getId());
+        extraClaims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+        return jwtService.generateToken(extraClaims, userDetails);
     }
 }
