@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './style/LoginPage.css'; // <--- Đừng quên import CSS
+import '../style/LoginPage.css'; // <--- Đừng quên import CSS
 
 interface AuthResponse {
   token: string;
