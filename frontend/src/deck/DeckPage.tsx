@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import FlashcardList from './FlashcardList'
+import FlashcardList from '../flashcard/FlashcardList'
 import { useNavigate, useParams } from 'react-router-dom' 
-import type { Flashcard } from './model/cardModel'
+import type { Flashcard } from '../model/cardModel'
 
 function DeckPage() {
   const navigate = useNavigate()

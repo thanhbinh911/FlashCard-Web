@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Flashcard } from './model/cardModel'
+import type { Flashcard } from '../model/cardModel'
 
 // Props: a single flashcard item to display
 interface FlashCardProps {

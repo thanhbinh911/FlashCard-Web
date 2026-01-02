@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import Navbar from './Navbar'
+import Navbar from '../Navbar'
 
 function CreateDeckPage() {
   // Router navigation helper to redirect after successful creation

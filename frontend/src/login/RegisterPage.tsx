@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './style/RegisterPage.css'; 
+import '../style/RegisterPage.css'; 
 
 interface AuthResponse {
   token: string;

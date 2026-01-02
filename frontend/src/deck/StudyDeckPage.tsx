@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import FlashCard from './FlashCard' // Import component hiển thị 1 thẻ
-import type { Flashcard } from './model/cardModel'
+import FlashCard from '../flashcard/FlashCard' // Import component hiển thị 1 thẻ
+import type { Flashcard } from '../model/cardModel'
 import './style/App.css' 
 
 // DATA MẪU (Giữ nguyên hoặc thay đổi tùy ý)
