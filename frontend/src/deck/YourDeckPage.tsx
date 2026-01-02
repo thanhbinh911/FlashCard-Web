@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import type { deck } from './model/deckModel'
+import type { deck } from '../model/deckModel'
 import DecksList from './DecksList'
-import Navbar from './Navbar'
+import Navbar from '../Navbar'
 import { FaPlus, FaLayerGroup } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 

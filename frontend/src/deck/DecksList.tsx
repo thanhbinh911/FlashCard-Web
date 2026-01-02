@@ -1,4 +1,4 @@
-import type { deck } from './model/deckModel'
+import type { deck } from '../model/deckModel'
 import Deck from './Deck'
 
 // Props: list of decks to render as cards

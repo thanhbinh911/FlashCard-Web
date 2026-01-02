@@ -1,5 +1,5 @@
 import FlashCard from './FlashCard'
-import type { Flashcard } from './model/cardModel'
+import type { Flashcard } from '../model/cardModel'
 
 // Props: array of flashcards to render
 interface FlashcardListProps {

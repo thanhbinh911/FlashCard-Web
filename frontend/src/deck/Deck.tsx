@@ -1,5 +1,5 @@
 
-import type { deck } from './model/deckModel'
+import type { deck } from '../model/deckModel'
 import { FaBook, FaArrowRight } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 

@@ -1,12 +1,12 @@
 
 import { Routes, Route } from "react-router-dom"
-import FlashcardPage from "./FlashcardPage"
-import Login from "./LoginPage"
-import Register from "./RegisterPage"
-import CreateDeckPage from "./CreateDeckPage"
-import YourDeckPage from "./YourDeckPage"
-import DeckPage from "./DeckPage"
-import AddCardPage from "./AddCardPage"
+import FlashcardPage from "./home/FlashcardPage"
+import Login from "./login/LoginPage"
+import Register from "./login/RegisterPage"
+import CreateDeckPage from "./deck/CreateDeckPage"
+import YourDeckPage from "./deck/YourDeckPage"
+import DeckPage from "./deck/DeckPage"
+import AddCardPage from "./flashcard/AddCardPage"
 
 function App() {
   return (

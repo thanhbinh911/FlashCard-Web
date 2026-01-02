@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
-import FlashcardList from "./FlashcardList"
-import Navbar from "./Navbar"
+import FlashcardList from "../flashcard/FlashcardList"
+import Navbar from "../Navbar"
 import axios from "axios"
 import { FaMagic, FaLayerGroup, FaListOl } from 'react-icons/fa' 
 
