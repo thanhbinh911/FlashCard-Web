@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import hust.soict.ict.flashcard_web.dto.ChangePasswordRequest;
 import hust.soict.ict.flashcard_web.dto.RegisterRequest;
 import hust.soict.ict.flashcard_web.entity.UserEntity;
-import hust.soict.ict.flashcard_web.exception.ResourceNotFoundException;
-import hust.soict.ict.flashcard_web.exception.UserAlreadyExistsException;
+import hust.soict.ict.flashcard_web.repository.exception.ResourceNotFoundException;
+import hust.soict.ict.flashcard_web.repository.exception.UserAlreadyExistsException;
 import hust.soict.ict.flashcard_web.repository.UserRepository;
 import hust.soict.ict.flashcard_web.security.CustomUserDetails;
 

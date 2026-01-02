@@ -10,7 +10,7 @@ import hust.soict.ict.flashcard_web.dto.FlashcardRequest;
 import hust.soict.ict.flashcard_web.dto.FlashcardResponse;
 import hust.soict.ict.flashcard_web.entity.DeckEntity;
 import hust.soict.ict.flashcard_web.entity.FlashcardEntity;
-import hust.soict.ict.flashcard_web.exception.ResourceNotFoundException;
+import hust.soict.ict.flashcard_web.repository.exception.ResourceNotFoundException;
 import hust.soict.ict.flashcard_web.repository.DeckRepository;
 import hust.soict.ict.flashcard_web.repository.FlashcardRepository;
 

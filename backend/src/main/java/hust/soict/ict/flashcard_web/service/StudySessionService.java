@@ -19,7 +19,7 @@ import hust.soict.ict.flashcard_web.entity.FlashcardEntity;
 import hust.soict.ict.flashcard_web.entity.SessionFlashcardEntity;
 import hust.soict.ict.flashcard_web.entity.StudySessionEntity;
 import hust.soict.ict.flashcard_web.entity.UserEntity;
-import hust.soict.ict.flashcard_web.exception.ResourceNotFoundException;
+import hust.soict.ict.flashcard_web.repository.exception.ResourceNotFoundException;
 import hust.soict.ict.flashcard_web.repository.DeckRepository;
 import hust.soict.ict.flashcard_web.repository.FlashcardRepository;
 import hust.soict.ict.flashcard_web.repository.SessionFlashcardRepository;

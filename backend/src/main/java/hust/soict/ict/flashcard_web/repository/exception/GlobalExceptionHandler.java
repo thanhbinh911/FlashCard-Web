@@ -1,4 +1,4 @@
-package hust.soict.ict.flashcard_web.exception;
+package hust.soict.ict.flashcard_web.repository.exception;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
