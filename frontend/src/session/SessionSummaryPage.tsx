@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FaCheckCircle, FaTimesCircle, FaArrowLeft, FaRedo } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle, FaArrowLeft } from 'react-icons/fa';
 import '../style/Session.css';
 
 function SessionSummaryPage() {
