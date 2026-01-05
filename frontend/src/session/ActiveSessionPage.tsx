@@ -17,13 +17,14 @@ function ActiveSessionPage() {
     setLoading(true);
     fetch('http://localhost:8080/api/sessions/active', {
       method: 'GET',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}` 
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     })
       .then(res => res.status === 204 ? null : res.json())
       .then(data => {
+        console.log("Active session data:", data);
         setSessionData(data);
         setLoading(false);
       })
@@ -35,15 +36,15 @@ function ActiveSessionPage() {
 
   const handleDeleteSession = () => {
     const idToDelete = sessionData?.sessionId;
-    
+
     if (!idToDelete) return;
 
     if (window.confirm("Are you sure you want to abandon this session? Progress will not be saved.")) {
       fetch(`http://localhost:8080/api/sessions/${idToDelete}/abandon`, {
         method: 'DELETE',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` 
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       })
         .then(res => {
@@ -63,7 +64,7 @@ function ActiveSessionPage() {
   return (
     <div className="session-page-container">
       <h2 className="page-title">Learning Status</h2>
-      
+
       <div className="session-card">
         {loading ? (
           <p style={{ textAlign: 'center', color: '#747d8c' }}>Loading session details...</p>
@@ -73,16 +74,22 @@ function ActiveSessionPage() {
             <button className='btn btn-danger' onClick={handleDeleteSession}>
               <FaTrashAlt /> Abandon Session
             </button>
-            <button className='btn btn-primary' onClick={() => navigate(`/study-session/${sessionData.sessionId}`)}>
+            <button className='btn btn-primary' onClick={() =>
+              navigate(`/study-session/${sessionData.sessionId}/${sessionData.deckTitle}/${sessionData.deckId}`)}>
               Continue Session
             </button>
           </>
         ) : (
           <div style={{ textAlign: 'center', padding: '20px' }}>
             <p style={{ color: '#747d8c', marginBottom: '20px' }}>No active session found. Ready to start a new one?</p>
-            <button className="btn btn-primary" onClick={() => navigate('/create-session')}>
-              <FaPlus /> Create New Session
-            </button>
+            <div className='btn-row'>
+              <button className="btn btn-primary" onClick={() => navigate('/create-session')}>
+                <FaPlus /> Create New Session
+              </button>
+              <button className="btn btn-outline" onClick={() => navigate('/flashcards')}>
+                Back to home page
+              </button>
+            </div>
           </div>
         )}
       </div>

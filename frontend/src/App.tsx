@@ -11,6 +11,8 @@ import AccountPage from "./home/AccountPage"
 import ChangePasswordPage from "./login/ChangePasswordPage"
 import CreateSessionPage from "./session/CreateSessionPage"
 import ActiveSessionPage from "./session/ActiveSessionPage"
+import SessionStudyPage from "./session/SessionStudyPage"
+import SessionSummaryPage from "./session/SessionSummaryPage"
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
       <Route path="/change-password" element={<ChangePasswordPage/>}/>
       <Route path="/create-session" element={<CreateSessionPage/>}/>
       <Route path="/active-session" element={<ActiveSessionPage/>}/>
+      <Route path="/study-session/:sessionId/:deckTitle/:deckId" element={<SessionStudyPage/>}/>
+      <Route path="/session/:sessionId/summary" element={<SessionSummaryPage/>}/>"
     </Routes>
   )
 }
