@@ -1,24 +1,27 @@
+// FlashCard.tsx
 import React from 'react'
 import type { Flashcard } from '../model/cardModel'
 
-// Props: a single flashcard item to display
 interface FlashCardProps {
   flashcard: Flashcard
+  isFlippable?: boolean 
 }
 
-const FlashCard = ({ flashcard }: FlashCardProps) => {
-  // Local state: whether the card is flipped to show the answer
+const FlashCard = ({ flashcard, isFlippable = true }: FlashCardProps) => { // Mặc định là true
   const [flip, setFlip] = React.useState(false)
 
+  const handleFlip = () => {
+    if (isFlippable) { 
+      setFlip(!flip)
+    }
+  }
+
   return (
-    // Card container: toggles flip on click
     <div 
-      className={`card ${flip ? 'flip' : ''}`} 
-      onClick={() => setFlip(!flip)}
+      className={`card ${flip ? 'flip' : ''} ${!isFlippable ? 'no-cursor' : ''}`} 
+      onClick={handleFlip}
     >
       <div className="card-inner">
-
-        {/* Front face: question and options */}
         <div className="card-front">
           <div className="card-content">
             <h3>{flashcard.question}</h3>
@@ -30,8 +33,6 @@ const FlashCard = ({ flashcard }: FlashCardProps) => {
           </div>
         </div>
 
-
-        {/* Back face: correct answer */}
         <div className="card-back">
           <div className="card-content">
             {flashcard.answer}

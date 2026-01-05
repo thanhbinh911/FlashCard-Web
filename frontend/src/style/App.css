@@ -541,12 +541,51 @@ body {
 .deck-controls {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch; /* Ép các phần tử con có chiều cao bằng nhau tuyệt đối */
+  gap: 1.5rem;  
   margin-bottom: 2rem;
   background: white;
   padding: 1rem 1.5rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
+}
+
+.deck-controls .btn, 
+.deck-controls .btn-outline {
+  flex: 1; 
+  height: 45px;            /* Cố định chiều cao */
+  display: flex;           /* Đồng bộ cả 2 dùng flex */
+  align-items: center;     /* Căn giữa nội dung theo chiều dọc */
+  justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+  margin: 0;
+  padding: 0 1.5rem;       /* Chỉ dùng padding trái phải */
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-sizing: border-box;           /* Cố định chiều cao để chắc chắn không bị lệch */
+}
+
+/* Đồng bộ hóa Border để không bị lệch 1px */
+.deck-controls .btn {
+  border: 1px solid transparent; /* Thêm viền trong suốt để khớp với nút outline */
+}
+
+.deck-controls .btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+
+/* Đồng bộ hóa hiệu ứng Hover để cả hai cùng đứng yên hoặc cùng nhích lên */
+.deck-controls .btn:hover,
+.deck-controls .btn-outline:hover {
+  transform: translateY(-2px); /* Cả 2 nút cùng nhích lên khi hover */
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+.deck-controls .btn-outline:hover {
+  background-color: #ebf5fb;
 }
 
 @media (max-width: 600px) {

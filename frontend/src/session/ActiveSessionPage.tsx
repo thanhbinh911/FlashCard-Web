@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import Session from './Session';
-import '../style/Session.css';
 import { useNavigate } from 'react-router-dom';
 import { FaTrashAlt, FaPlus } from 'react-icons/fa';
+import '../style/Session.css';
 
 function ActiveSessionPage() {
   const navigate = useNavigate();
@@ -72,6 +72,9 @@ function ActiveSessionPage() {
             <Session session={sessionData} />
             <button className='btn btn-danger' onClick={handleDeleteSession}>
               <FaTrashAlt /> Abandon Session
+            </button>
+            <button className='btn btn-primary' onClick={() => navigate(`/study-session/${sessionData.sessionId}`)}>
+              Continue Session
             </button>
           </>
         ) : (
