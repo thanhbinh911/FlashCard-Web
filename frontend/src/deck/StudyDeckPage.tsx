@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import FlashCard from '../flashcard/FlashCard' // Import component hiển thị 1 thẻ
 import type { Flashcard } from '../model/cardModel'
