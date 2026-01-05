@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react"
 import FlashcardList from "../flashcard/FlashcardList"
 import Navbar from "../Navbar"
 import axios from "axios"
-import { FaMagic, FaLayerGroup, FaListOl } from 'react-icons/fa' 
+import { FaMagic, FaLayerGroup, FaListOl } from 'react-icons/fa'
 
 function FlashcardPage() {
   // Generated flashcards for the current session
   const [flashcards, setFlashcards] = useState([])
   // Available categories fetched from OpenTDB
-  const [categories, setCategories] = useState<Array<{id: number, name: string}>>([])
+  const [categories, setCategories] = useState<Array<{ id: number, name: string }>>([])
   // Form controls: selected category and desired quantity
   const [category, setCategory] = useState('')
   const [amount, setAmount] = useState(10)
@@ -43,19 +43,18 @@ function FlashcardPage() {
     }
   }, [categories, category])
 
-  // Submit: request boolean-type questions from OpenTDB
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (loading) return
     setLoading(true)
-    setFlashcards([]) 
+    setFlashcards([])
 
     axios
       .get('https://opentdb.com/api.php', {
         params: {
           amount,
           category,
-          timestamp: Date.now() 
+          timestamp: Date.now()
         }
       })
       .then(response => {
@@ -68,7 +67,7 @@ function FlashcardPage() {
             .concat(decodeString(item.correct_answer))
             .sort(() => Math.random() - 0.5)
         }))
-        
+
         setFlashcards(results)
         // Persist current state in sessionStorage
         sessionStorage.setItem('flashcards', JSON.stringify(results))
@@ -77,7 +76,6 @@ function FlashcardPage() {
       })
       .catch(err => {
         console.error(err)
-        // TODO: replace alert with inline toast/notification component
         alert("Failed to generate cards. Please try again.")
       })
       .finally(() => {
@@ -88,56 +86,56 @@ function FlashcardPage() {
   return (
     <>
       <Navbar />
-      
+
       <div className="container">
         {/* Controls: category and quantity selector */}
         <form className="controls-header" onSubmit={handleSubmit}>
-          
+
 
           <div className="control-group">
-           
-            <label className="control-label" htmlFor="category" style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-              <FaLayerGroup /> 
+
+            <label className="control-label" htmlFor="category" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FaLayerGroup />
               <span>Topic Category</span>
             </label>
-            <select 
-              id="category" 
+            <select
+              id="category"
               className="form-select"
-              value={category} 
+              value={category}
               onChange={e => setCategory(e.target.value)}
             >
-              {categories.map(cat => 
+              {categories.map(cat =>
                 <option value={cat.id} key={cat.id}>{cat.name}</option>
               )}
             </select>
           </div>
 
-       
+
           <div className="control-group">
- 
-            <label className="control-label" htmlFor="amount" style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-              <FaListOl /> 
+
+            <label className="control-label" htmlFor="amount" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FaListOl />
               <span>Quantity</span>
             </label>
-            <input 
-              type="number" 
-              id="amount" 
+            <input
+              type="number"
+              id="amount"
               className="form-input"
-              min="1" max="50" step="1" 
-              value={amount} 
-              onChange={e => setAmount(Number(e.target.value))} 
+              min="1" max="50" step="1"
+              value={amount}
+              onChange={e => setAmount(Number(e.target.value))}
             />
           </div>
 
 
           {/* Generate button: shows loading state while fetching */}
-          <div style={{marginBottom: '2px'}}> 
-            <button className="btn" disabled={loading} style={{height: '42px', minWidth: '160px'}}>
+          <div style={{ marginBottom: '2px' }}>
+            <button className="btn" disabled={loading} style={{ height: '42px', minWidth: '160px' }}>
               {loading ? (
-                 <>Generating...</>
+                <>Generating...</>
               ) : (
-              
-                 <><FaMagic /> Generate Cards</>
+
+                <><FaMagic /> Generate Cards</>
               )}
             </button>
           </div>

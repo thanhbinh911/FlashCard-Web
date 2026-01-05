@@ -40,6 +40,9 @@ const Navbar = () => {
         <div className={`nav-link ${isActive('/create-deck')}`} onClick={() => navigate('/create-deck')}>
           <FaPlusCircle /> Create
         </div>
+        <div className={`nav-link ${isActive('/create-session')}`} onClick={() => navigate('/create-session')}>
+          <FaPlusCircle /> Create Session
+        </div>
       </div>
 
       {/* Right section: avatar, username, and logout */}

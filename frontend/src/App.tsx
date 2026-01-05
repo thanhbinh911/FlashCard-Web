@@ -9,6 +9,7 @@ import DeckPage from "./deck/DeckPage"
 import AddCardPage from "./flashcard/AddCardPage"
 import AccountPage from "./home/AccountPage"
 import ChangePasswordPage from "./login/ChangePasswordPage"
+import CreateSessionPage from "./session/CreateSessionPage"
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/decks/:deckId/:deckTitle/add-flashcard" element={<AddCardPage  />} />
       <Route path="/account" element={<AccountPage/>}/>
       <Route path="/change-password" element={<ChangePasswordPage/>}/>
+      <Route path="/create-session" element={<CreateSessionPage/>}/>
     </Routes>
   )
 }

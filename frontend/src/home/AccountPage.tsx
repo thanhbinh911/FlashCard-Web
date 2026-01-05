@@ -29,22 +29,22 @@ function AccountPage() {
             {/* Tên đăng nhập */}
             <div className="form-group">
               <label className="control-label">Username</label>
-              <input 
-                className="form-input" 
-                value={username} 
-                readOnly 
-                style={{ backgroundColor: '#f8f9fa', cursor: 'default' }} 
+              <input
+                className="form-input"
+                value={username}
+                readOnly
+                style={{ backgroundColor: '#f8f9fa', cursor: 'default' }}
               />
             </div>
 
             {/* Email */}
             <div className="form-group">
               <label className="control-label">Email</label>
-              <input 
-                className="form-input" 
-                type="email" 
-                value={emailPlaceholder} 
-                readOnly 
+              <input
+                className="form-input"
+                type="email"
+                value={emailPlaceholder}
+                readOnly
                 style={{ backgroundColor: '#f8f9fa', cursor: 'default' }}
               />
             </div>
@@ -53,15 +53,15 @@ function AccountPage() {
             <div className="form-group">
               <label className="control-label">Password</label>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input 
-                  className="form-input" 
-                  type="password" 
-                  value="********" 
-                  readOnly 
-                  style={{ flex: 1, backgroundColor: '#f8f9fa' }} 
+                <input
+                  className="form-input"
+                  type="password"
+                  value="********"
+                  readOnly
+                  style={{ flex: 1, backgroundColor: '#f8f9fa' }}
                 />
-                <button 
-                  className="btn-outline" 
+                <button
+                  className="btn-outline"
                   style={{ padding: '0 15px', fontSize: '0.85rem', whiteSpace: 'nowrap' }}
                   onClick={() => navigate('/change-password')}
                 >
@@ -74,16 +74,16 @@ function AccountPage() {
 
             {/* Các nút điều hướng */}
             <div className="form-actions" style={{ display: 'flex', gap: '1rem' }}>
-              <button 
-                className="btn btn-outline" 
-                style={{ flex: 1 }} 
+              <button
+                className="btn btn-outline"
+                style={{ flex: 1 }}
                 onClick={() => navigate('/flashcards')}
               >
                 Back
               </button>
-              <button 
-                className="btn" 
-                style={{ flex: 1, backgroundColor: '#e74c3c' }} 
+              <button
+                className="btn"
+                style={{ flex: 1, backgroundColor: '#e74c3c' }}
                 onClick={handleLogout}
               >
                 Logout
