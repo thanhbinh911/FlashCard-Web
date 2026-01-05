@@ -10,6 +10,7 @@ import AddCardPage from "./flashcard/AddCardPage"
 import AccountPage from "./home/AccountPage"
 import ChangePasswordPage from "./login/ChangePasswordPage"
 import CreateSessionPage from "./session/CreateSessionPage"
+import ActiveSessionPage from "./session/ActiveSessionPage"
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Route path="/account" element={<AccountPage/>}/>
       <Route path="/change-password" element={<ChangePasswordPage/>}/>
       <Route path="/create-session" element={<CreateSessionPage/>}/>
+      <Route path="/active-session" element={<ActiveSessionPage/>}/>
     </Routes>
   )
 }
