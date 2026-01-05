@@ -188,12 +188,67 @@ body {
   FLASHCARD GRID & 3D FLIP
    */
 
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+.card-slider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 2rem;
-  padding-bottom: 3rem;
-  align-items: start; 
+  margin-top: 2rem;
+  width: 100%;
+}
+
+/* Hàng chứa nút và card */
+.slider-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem; /* Khoảng cách giữa nút và card */
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Wrapper cho card để khống chế kích thước */
+.single-card-wrapper {
+  width: 100%;
+  max-width: 450px; /* Độ rộng của thẻ khi hiện đơn lẻ */
+}
+
+/* Nút điều hướng tròn */
+.btn-nav {
+  background-color: white;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-nav:hover:not(:disabled) {
+  background-color: var(--primary);
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-nav:disabled {
+  border-color: #dfe6e9;
+  color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Bộ đếm số trang */
+.card-counter {
+  font-weight: 600;
+  color: var(--text-light);
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Card container */
