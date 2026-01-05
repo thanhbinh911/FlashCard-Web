@@ -1,33 +1,33 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { deck } from '../model/deckModel';
-import { FaLayerGroup } from 'react-icons/fa';
+import { FaLayerGroup, FaClock, FaPlay, FaArrowLeft, FaCheckSquare } from 'react-icons/fa';
+import '../style/Session.css';
 
 function CreateSessionPage() {
   const navigate = useNavigate();
   const [sessionMode, setSessionMode] = useState('REGULAR');
-  const [decks, setDecks] = React.useState<deck[]>([])
-  const [selectedDeck, setSelectedDeck] = useState(0);
-  const [timeLimitSeconds, setTimeLimitSeconds] = useState(0);
+  const [decks, setDecks] = useState<deck[]>([]);
+  const [selectedDeckId, setSelectedDeckId] = useState<number>(0);
+  const [timeLimitSeconds, setTimeLimitSeconds] = useState(60);
   const [isPracticeMode, setIsPracticeMode] = useState(false);
-  const mode = ['REGULAR', 'MCQ', 'REVIEW'];
+  const modes = ['REGULAR', 'MCQ', 'REVIEW'];
 
   useEffect(() => {
     fetch('http://localhost:8080/api/decks', {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
-      .then(data => setDecks(data))
-      .catch(err => console.error(err))
-  }, [])
+      .then(data => {
+        setDecks(data);
+        if (data.length > 0) setSelectedDeckId(data[0].id);
+      })
+      .catch(err => console.error(err));
+  }, []);
 
-  function handleCreateSession(e: React.FormEvent) {
+  const handleCreateSession = (e: React.FormEvent) => {
     e.preventDefault();
-    
     fetch('http://localhost:8080/api/sessions/start', {
       method: 'POST',
       headers: {
@@ -35,82 +35,84 @@ function CreateSessionPage() {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       body: JSON.stringify({
-        deckId: decks[selectedDeck].id,
-        timeLimitSeconds: timeLimitSeconds,
-        isPracticeMode: isPracticeMode,
-        sessionMode: sessionMode
+        deckId: selectedDeckId,
+        timeLimitSeconds,
+        isPracticeMode,
+        sessionMode
       })
     })
-      .then(res => res.json())
-      .then(() => navigate('/active-session'))
-      .catch(err => console.error(err))
-  }
+      .then(res => res.ok ? navigate('/active-session') : console.error("Error starting session"))
+      .catch(err => console.error(err));
+  };
 
   return (
-    <>
-      <h2 className="page-title" style={{ marginBottom: '1.5rem' }}>Create New Session</h2>
-      <div className="control-group">
+    <div className="session-page-container">
+      <div className="session-card">
+        <h2 className="page-title">Create New Session</h2>
+        
+        <form onSubmit={handleCreateSession}>
+          <div className="form-group">
+            <label className="control-label" htmlFor="deck">
+              <FaLayerGroup /> Deck
+            </label>
+            <select
+              id="deck"
+              className="form-select"
+              value={selectedDeckId}
+              onChange={e => setSelectedDeckId(Number(e.target.value))}
+            >
+              {decks.map(deck => <option value={deck.id} key={deck.id}>{deck.title}</option>)}
+            </select>
+          </div>
 
-        <label className="control-label" htmlFor="deck" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <FaLayerGroup />
-          <span>Deck</span>
-        </label>
-        <select
-          id="deck"
-          className="form-select"
-          value={decks.length > 0 ? decks[selectedDeck].id : 0}
-          onChange={e => setSelectedDeck(Number(e.target.value))}
-        >
-          {decks.map(deck =>
-            <option value={deck.id} key={deck.id}>{deck.title}</option>
-          )}
-        </select>
+          <div className="form-group">
+            <label className="control-label" htmlFor="mode">
+              <FaCheckSquare /> Session Mode
+            </label>
+            <select
+              id="mode"
+              className="form-select"
+              value={sessionMode}
+              onChange={e => setSessionMode(e.target.value)}
+            >
+              {modes.map(m => <option value={m} key={m}>{m}</option>)}
+            </select>
+          </div>
 
-        <label className="control-label" htmlFor="mode" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
-          <FaLayerGroup />
-          <span>Session Mode</span>
-        </label>
-        <select
-          id="mode"
-          className="form-select"
-          value={sessionMode}
-          onChange={e => setSessionMode(e.target.value)}
-        >
-          {mode.map(m => (
-            <option value={m} key={m}>{m}</option>
-          ))}
-        </select>
+          <div className="form-group">
+            <label className="control-label" htmlFor="timeLimit">
+              <FaClock /> Time Limit (seconds)
+            </label>
+            <input
+              id="timeLimit"
+              type="number"
+              className="form-input"
+              value={timeLimitSeconds}
+              onChange={e => setTimeLimitSeconds(Number(e.target.value))}
+            />
+          </div>
 
-        <label className="control-label" htmlFor="timeLimit" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
-          <FaLayerGroup />
-          <span>Time Limit (seconds)</span>
-        </label>
-        <input
-          id="timeLimit"
-          type="number"
-          className="form-input"
-          value={timeLimitSeconds}
-          onChange={e => setTimeLimitSeconds(Number(e.target.value))}
-        />
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', cursor: 'pointer', fontWeight: 'normal' }}>
-          <input
-            type="checkbox"
-            checked={isPracticeMode}
-            onChange={() => setIsPracticeMode(!isPracticeMode)}
-          />
-          Practice Mode
-        </label>
-        <button 
-          className="btn" 
-          style={{ marginTop: '1.5rem' }}
-          onClick={handleCreateSession}
-        >
-          Create Session
-        </button>
+          <label className="checkbox-group">
+            <input
+              type="checkbox"
+              checked={isPracticeMode}
+              onChange={() => setIsPracticeMode(!isPracticeMode)}
+            />
+            <span>Enable Practice Mode</span>
+          </label>
+
+          <div className="btn-group">
+            <button type="submit" className="btn btn-primary">
+              <FaPlay style={{marginRight: '8px'}}/> Start Learning
+            </button>
+            <button type="button" className="btn btn-outline" onClick={() => navigate('/flashcards')}>
+              <FaArrowLeft style={{marginRight: '8px'}}/> Back to Dashboard
+            </button>
+          </div>
+        </form>
       </div>
-    </>
-
-  )
+    </div>
+  );
 }
 
-export default CreateSessionPage
+export default CreateSessionPage;
