@@ -49,6 +49,7 @@ const Navbar = () => {
             src={`https://ui-avatars.com/api/?name=${username}&background=random&color=fff`} 
             alt="Avatar" 
             style={{width: '32px', height: '32px', borderRadius: '50%'}}
+            onClick={() => navigate('/account')}
           />
           <span>{username}</span>
         </div>
