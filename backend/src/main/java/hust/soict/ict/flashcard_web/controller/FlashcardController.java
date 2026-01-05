@@ -35,7 +35,7 @@ public class FlashcardController {
      * GET /api/decks/{deckId}/flashcards
      */
     @GetMapping
-    @PreAuthorize("@securityService.canViewFlashcard(#deckId, authentication)")
+    @PreAuthorize("@securityService.canViewDeck(#deckId, authentication)")
     public ResponseEntity<List<FlashcardResponse>> getFlashcardsByDeck(
             @PathVariable Long deckId, 
             Authentication authentication) {
