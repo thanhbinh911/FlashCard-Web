@@ -55,7 +55,6 @@ function FlashcardPage() {
         params: {
           amount,
           category,
-          type: 'boolean', 
           timestamp: Date.now() 
         }
       })
