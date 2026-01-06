@@ -21,7 +21,10 @@ function YourDeckPage() {
       }
     })
     .then(res => res.json())
-    .then(data => setDecks(data))
+    .then(data => {
+      setDecks(data)
+      console.log("Fetched decks:", data)
+      })
     .catch(err => console.error(err))
   }, [])
 

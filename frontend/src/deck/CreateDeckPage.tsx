@@ -46,7 +46,7 @@ function CreateDeckPage() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
-      body: JSON.stringify({ title, description, isPublic, flashcards})
+      body: JSON.stringify({ title, description, public: isPublic, flashcards})
     })
       // Parse JSON response; backend should return the created deck
       .then(res => res.json())

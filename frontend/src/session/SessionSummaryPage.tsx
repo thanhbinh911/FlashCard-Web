@@ -20,6 +20,7 @@ function SessionSummaryPage() {
       .then(data => {
         setSummary(data);
         setLoading(false);
+        console.log("Session summary data:", data);
       })
       .catch(err => {
         console.error("Error:", err);
@@ -71,14 +72,14 @@ function SessionSummaryPage() {
               <div className="review-content">
                 <p className="review-q"><strong>Q:</strong> {q.question}</p>
                 <p className="review-a">
-                  <strong>Your Answer:</strong> 
+                  <strong>Correct Answer:</strong> 
                   <span className={q.isCorrect ? "text-success" : "text-danger"}>
                     {q.userAnswer || "No answer"}
                   </span>
                 </p>
                 {!q.isCorrect && (
                   <p className="review-correct">
-                    <strong>Correct Answer:</strong> <span className="text-success">{q.correctAnswer}</span>
+                    <strong>Your Answer:</strong> <span className="text-success">{q.correctAnswer}</span>
                   </p>
                 )}
               </div>
