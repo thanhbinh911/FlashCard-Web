@@ -1,174 +1,179 @@
 package hust.soict.ict.flashcard_web.service;
 
-import hust.soict.ict.flashcard_web.dto.DeckRequest;
-import hust.soict.ict.flashcard_web.dto.DeckResponse;
-import hust.soict.ict.flashcard_web.entity.DeckEntity;
-import hust.soict.ict.flashcard_web.entity.UserEntity;
-import hust.soict.ict.flashcard_web.repository.DeckRepository;
-import hust.soict.ict.flashcard_web.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * This service class handles business logic related to decks.
- * It provides methods for creating, retrieving, updating, and deleting decks,
- * ensuring that users can only operate on their own decks.
- */
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import hust.soict.ict.flashcard_web.dto.DeckRequest;
+import hust.soict.ict.flashcard_web.dto.DeckResponse;
+import hust.soict.ict.flashcard_web.dto.FlashcardRequest;
+import hust.soict.ict.flashcard_web.entity.DeckEntity;
+import hust.soict.ict.flashcard_web.entity.FlashcardEntity;
+import hust.soict.ict.flashcard_web.entity.UserEntity;
+import hust.soict.ict.flashcard_web.repository.exception.AuthenticationRequiredException;
+import hust.soict.ict.flashcard_web.repository.exception.ResourceNotFoundException;
+import hust.soict.ict.flashcard_web.repository.DeckRepository;
+import hust.soict.ict.flashcard_web.repository.FlashcardRepository;
+import hust.soict.ict.flashcard_web.repository.UserRepository;
+import hust.soict.ict.flashcard_web.security.SecurityService;
+
 @Service
 public class DeckService {
 
-    @Autowired
-    private DeckRepository deckRepository;
+    private final DeckRepository deckRepository;
+    private final UserRepository userRepository;
+    private final FlashcardRepository flashcardRepository;
+    private final SecurityService securityService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    /**
-     * Retrieves the currently authenticated user from the security context.
-     *
-     * @return the `UserEntity` of the authenticated user.
-     * @throws RuntimeException if the user is not authenticated or not found in the database.
-     */
-    private UserEntity getCurrentAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
-            throw new RuntimeException("User is not authenticated.");
-        }
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
-
-        return userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+    public DeckService(DeckRepository deckRepository, UserRepository userRepository, 
+                       FlashcardRepository flashcardRepository, SecurityService securityService) {
+        this.deckRepository = deckRepository;
+        this.userRepository = userRepository;
+        this.flashcardRepository = flashcardRepository;
+        this.securityService = securityService;
     }
 
     /**
-     * Checks if the given user is the owner of the specified deck.
-     *
-     * @param deck the deck to check.
-     * @param user the user to verify.
-     * @throws RuntimeException if the user is not the owner of the deck.
+     * Helper method to get deck entity by ID.
+     * Throws ResourceNotFoundException if deck doesn't exist.
      */
-    private void checkDeckOwnership(DeckEntity deck, UserEntity user) {
-        if (!deck.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("You do not have permission to access or modify this deck.");
-        }
+    private DeckEntity getDeckEntityById(Long deckId) {
+        return deckRepository.findById(deckId)
+                .orElseThrow(() -> new ResourceNotFoundException("Deck not found"));
     }
 
+
     /**
-     * Converts a `DeckEntity` object to a `DeckResponse` DTO.
-     *
-     * @param entity the `DeckEntity` to convert.
-     * @return the corresponding `DeckResponse` object.
+     * Helper method to convert deck entity to response object.
      */
-    private DeckResponse convertToResponse(DeckEntity entity) {
-        String formattedDate = (entity.getCreatedAt() != null)
-                ? entity.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    private DeckResponse convertToResponse(DeckEntity deck) {
+        String formattedDate = (deck.getCreatedAt() != null)
+                ? deck.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                 : null;
-
-        return new DeckResponse(
-                entity.getId(),
-                entity.getTitle(),
-                entity.getDescription(),
-                formattedDate
-        );
+        return new DeckResponse(deck.getId(), deck.getTitle(), deck.getDescription(), formattedDate);
     }
 
-    /**
-     * Retrieves all decks belonging to the currently authenticated user.
-     *
-     * @return a list of `DeckResponse` objects.
-     */
-    public List<DeckResponse> getAllDecks() {
-        UserEntity currentUser = getCurrentAuthenticatedUser();
+    public List<DeckEntity> getAllDeck() {
+        return deckRepository.findAll();
+    }
 
-        return deckRepository.findByUser_Id(currentUser.getId())
-                .stream()
+    public List<DeckResponse> getAllDecksPublicFiltered(Authentication authentication) {
+        boolean isAdmin = securityService.isAdmin(authentication);
+        Long authUserId = securityService.getAuthUserId(authentication);
+
+        return getAllDeck().stream()
+                .filter(d -> isAdmin || 
+                        (d.getUser() != null && authUserId != null && d.getUser().getId().equals(authUserId)) || 
+                        d.isPublic())
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Retrieves a specific deck by its ID.
-     * Ensures that the deck belongs to the currently authenticated user.
-     *
-     * @param deckId the ID of the deck to retrieve.
-     * @return the `DeckResponse` object.
-     * @throws RuntimeException if the deck is not found or the user is not the owner.
+     * Create a new deck with optional flashcards.
+     * If flashcards are provided in the request, they will be created along with the deck.
      */
-    public DeckResponse getDeckById(Long deckId) {
-        UserEntity currentUser = getCurrentAuthenticatedUser();
-        DeckEntity deck = deckRepository.findById(deckId)
-                .orElseThrow(() -> new RuntimeException("Deck not found with ID: " + deckId));
+    @Transactional
+    public DeckResponse createDeck(DeckRequest req, Authentication authentication) {
+        Long authUserId = securityService.getAuthUserId(authentication);
+        if (authUserId == null) {
+            throw new AuthenticationRequiredException("Please login or register to create a deck");
+        }
 
-        checkDeckOwnership(deck, currentUser);
+        UserEntity user = userRepository.findById(authUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        DeckEntity deck = new DeckEntity();
+        deck.setTitle(req.getTitle());
+        deck.setDescription(req.getDescription());
+        deck.setUser(user);
+        deck.setPublic(req.isPublic());
+
+        DeckEntity saved = deckRepository.save(deck);
+        
+        // Create flashcards (required - minimum 2)
+        List<FlashcardEntity> flashcards = new ArrayList<>();
+        for (FlashcardRequest fc : req.getFlashcards()) {
+            FlashcardEntity flashcard = new FlashcardEntity();
+            flashcard.setQuestion(fc.getQuestionText());
+            flashcard.setAnswer(fc.getAnswerText());
+            flashcard.setHint(fc.getHint());
+            flashcard.setDeck(saved);
+            flashcards.add(flashcard);
+        }
+        flashcardRepository.saveAll(flashcards);
+        
+        return convertToResponse(saved);
+    }
+
+    public DeckResponse getDeckById(Long deckId, Authentication authentication) {
+        DeckEntity deck = getDeckEntityById(deckId);
+        checkReadAccess(deckId, authentication);
         return convertToResponse(deck);
     }
 
-    /**
-     * Creates a new deck for the currently authenticated user.
-     *
-     * @param request the `DeckRequest` object containing the new deck's data.
-     * @return the `DeckResponse` object for the newly created deck.
-     */
-    public DeckResponse createDeck(DeckRequest request) {
-        UserEntity currentUser = getCurrentAuthenticatedUser();
+    public DeckResponse updateDeck(Long deckId, DeckRequest req, Authentication authentication) {
+        DeckEntity deck = getDeckEntityById(deckId);
+        checkWriteAccess(deckId, authentication);
 
-        DeckEntity newDeck = new DeckEntity();
-        newDeck.setTitle(request.getTitle());
-        newDeck.setDescription(request.getDescription());
-        newDeck.setUser(currentUser);
+        deck.setTitle(req.getTitle());
+        deck.setDescription(req.getDescription());
+        deck.setPublic(req.isPublic());
 
-        DeckEntity savedDeck = deckRepository.save(newDeck);
-        return convertToResponse(savedDeck);
+        DeckEntity saved = deckRepository.save(deck);
+        return convertToResponse(saved);
+    }
+
+    public void deleteDeck(Long deckId, Authentication authentication) {
+        getDeckEntityById(deckId); 
+        checkWriteAccess(deckId, authentication);
+        deckRepository.deleteById(deckId);
     }
 
     /**
-     * Updates an existing deck.
-     * Ensures that the deck belongs to the currently authenticated user.
-     *
-     * @param deckId  the ID of the deck to update.
-     * @param request the `DeckRequest` object with the updated data.
-     * @return the `DeckResponse` object for the updated deck.
-     * @throws RuntimeException if the deck is not found or the user is not the owner.
+     * Search decks by keyword in title, description, or category name.
+     * Filters results based on access control (public decks, user's own decks, or admin).
      */
-    public DeckResponse updateDeck(Long deckId, DeckRequest request) {
-        UserEntity currentUser = getCurrentAuthenticatedUser();
-        DeckEntity existingDeck = deckRepository.findById(deckId)
-                .orElseThrow(() -> new RuntimeException("Deck not found with ID: " + deckId));
+    public List<DeckResponse> searchDecks(String keyword, Authentication authentication) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getAllDecksPublicFiltered(authentication);
+        }
 
-        checkDeckOwnership(existingDeck, currentUser);
+        boolean isAdmin = securityService.isAdmin(authentication);
+        Long authUserId = securityService.getAuthUserId(authentication);
 
-        existingDeck.setTitle(request.getTitle());
-        existingDeck.setDescription(request.getDescription());
-
-        DeckEntity updatedDeck = deckRepository.save(existingDeck);
-        return convertToResponse(updatedDeck);
+        return deckRepository.searchByKeyword(keyword.trim()).stream()
+                .filter(d -> isAdmin || 
+                        (d.getUser() != null && authUserId != null && d.getUser().getId().equals(authUserId)) || 
+                        d.isPublic())
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Deletes a deck by its ID.
-     * Ensures that the deck belongs to the currently authenticated user.
-     *
-     * @param deckId the ID of the deck to delete.
-     * @throws RuntimeException if the deck is not found or the user is not the owner.
+     * Check if user has read access to a deck.
+     * Throws AccessDeniedException if not authorized.
      */
-    public void deleteDeck(Long deckId) {
-        UserEntity currentUser = getCurrentAuthenticatedUser();
-        DeckEntity deckToDelete = deckRepository.findById(deckId)
-                .orElseThrow(() -> new RuntimeException("Deck not found with ID: " + deckId));
+    public void checkReadAccess(Long deckId, Authentication authentication) {
+        if (!securityService.canViewDeck(deckId, authentication)) {
+            throw new AccessDeniedException("Not authorized to view this deck");
+        }
+    }
 
-        checkDeckOwnership(deckToDelete, currentUser);
-
-        deckRepository.delete(deckToDelete);
+    /**
+     * Check if user has write access to a deck.
+     * Only the deck owner can modify their deck.
+     * Throws AccessDeniedException if not authorized.
+     */
+    public void checkWriteAccess(Long deckId, Authentication authentication) {
+        if (!securityService.isDeckOwner(deckId, authentication)) {
+            throw new AccessDeniedException("Not authorized to modify this deck");
+        }
     }
 }

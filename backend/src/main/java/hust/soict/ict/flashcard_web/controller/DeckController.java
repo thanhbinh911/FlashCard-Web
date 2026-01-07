@@ -1,89 +1,87 @@
 package hust.soict.ict.flashcard_web.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import hust.soict.ict.flashcard_web.dto.DeckRequest;
 import hust.soict.ict.flashcard_web.dto.DeckResponse;
+import hust.soict.ict.flashcard_web.dto.MessageResponse;
 import hust.soict.ict.flashcard_web.service.DeckService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-/**
- * This controller handles RESTful API requests related to decks.
- * It provides endpoints for creating, retrieving, updating, and deleting decks.
- * All operations are secured and require user authentication.
- */
 @RestController
 @RequestMapping("/api/decks")
 public class DeckController {
 
-    @Autowired
-    private DeckService deckService;
+    private final DeckService deckService;
 
-    /**
-     * Retrieves all decks belonging to the authenticated user.
-     *
-     * @return A `ResponseEntity` containing a list of `DeckResponse` objects.
-     */
+    public DeckController(DeckService deckService) {
+        this.deckService = deckService;
+    }
+
     @GetMapping
-    public ResponseEntity<List<DeckResponse>> getAllDecks() {
-        List<DeckResponse> decks = deckService.getAllDecks();
+    public ResponseEntity<List<DeckResponse>> getAllDecks(Authentication authentication) {
+        List<DeckResponse> decks = deckService.getAllDecksPublicFiltered(authentication);
         return ResponseEntity.ok(decks);
     }
 
-    /**
-     * Creates a new deck for the authenticated user.
-     *
-     * @param request The request body containing the title and description of the new deck.
-     * @return A `ResponseEntity` containing the created `DeckResponse` object.
-     */
-    @PostMapping
-    public ResponseEntity<DeckResponse> createDeck(@RequestBody DeckRequest request) {
-        DeckResponse newDeck = deckService.createDeck(request);
-        return ResponseEntity.ok(newDeck);
+    @GetMapping("/search")
+    public ResponseEntity<List<DeckResponse>> searchDecks(
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            Authentication authentication) {
+        List<DeckResponse> decks = deckService.searchDecks(keyword, authentication);
+        return ResponseEntity.ok(decks);
     }
 
-    /**
-     * Retrieves a specific deck by its ID.
-     * The user must be the owner of the deck.
-     *
-     * @param deckId The ID of the deck to retrieve.
-     * @return A `ResponseEntity` containing the requested `DeckResponse` object.
-     */
+
+
+    @PostMapping 
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<DeckResponse> createDeck(
+            @Valid @RequestBody DeckRequest request, 
+            Authentication authentication) {
+        DeckResponse newDeck = deckService.createDeck(request, authentication);
+        return ResponseEntity.ok(newDeck);
+    }
+    
+
     @GetMapping("/{deckId}")
-    public ResponseEntity<DeckResponse> getDeckById(@PathVariable Long deckId) {
-        DeckResponse deck = deckService.getDeckById(deckId);
+    @PreAuthorize("@securityService.canViewDeck(#deckId, authentication)")
+    public ResponseEntity<DeckResponse> getDeckById(
+            @PathVariable Long deckId, 
+            Authentication authentication) {
+        DeckResponse deck = deckService.getDeckById(deckId, authentication);
         return ResponseEntity.ok(deck);
     }
 
-    /**
-     * Updates an existing deck.
-     * The user must be the owner of the deck.
-     *
-     * @param deckId  The ID of the deck to update.
-     * @param request The request body with the updated title and description.
-     * @return A `ResponseEntity` containing the updated `DeckResponse` object.
-     */
     @PutMapping("/{deckId}")
-    public ResponseEntity<DeckResponse> updateDeck(@PathVariable Long deckId, @RequestBody DeckRequest request) {
-        DeckResponse updatedDeck = deckService.updateDeck(deckId, request);
+    @PreAuthorize("isAuthenticated() and @securityService.isDeckOwner(#deckId, authentication)")
+    public ResponseEntity<DeckResponse> updateDeck(
+            @PathVariable Long deckId, 
+            @Valid @RequestBody DeckRequest request, 
+            Authentication authentication) {
+        DeckResponse updatedDeck = deckService.updateDeck(deckId, request, authentication);
         return ResponseEntity.ok(updatedDeck);
     }
 
-    /**
-     * Deletes a deck by its ID.
-     * The user must be the owner of the deck.
-     *
-     * @param deckId The ID of the deck to delete.
-     * @return A `ResponseEntity` with a success message.
-     */
     @DeleteMapping("/{deckId}")
-    public ResponseEntity<Map<String, String>> deleteDeck(@PathVariable Long deckId) {
-        deckService.deleteDeck(deckId);
-        Map<String, String> response = Collections.singletonMap("message", "Deck deleted successfully");
-        return ResponseEntity.ok(response);
+    @PreAuthorize("isAuthenticated() and @securityService.isDeckOwner(#deckId, authentication)")
+    public ResponseEntity<MessageResponse> deleteDeck(
+            @PathVariable Long deckId, 
+            Authentication authentication) {
+        deckService.deleteDeck(deckId, authentication);
+        return ResponseEntity.ok(new MessageResponse("Deck deleted successfully"));
     }
 }

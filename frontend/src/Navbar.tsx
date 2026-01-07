@@ -28,6 +28,9 @@ const Navbar = () => {
       </div>
       
       <div className="nav-links">
+        <div className={`nav-link ${isActive('/admin')}`} onClick={() => navigate('/admin')}>
+          <FaLayerGroup /> Admin
+        </div>
         {/* Practice route */}
         <div className={`nav-link ${isActive('/flashcards')}`} onClick={() => navigate('/flashcards')}>
           <FaLayerGroup /> Practice
@@ -40,6 +43,9 @@ const Navbar = () => {
         <div className={`nav-link ${isActive('/create-deck')}`} onClick={() => navigate('/create-deck')}>
           <FaPlusCircle /> Create
         </div>
+        <div className={`nav-link ${isActive('/active-session')}`} onClick={() => navigate('/active-session')}>
+          <FaPlusCircle /> Session
+        </div>
       </div>
 
       {/* Right section: avatar, username, and logout */}
@@ -49,6 +55,7 @@ const Navbar = () => {
             src={`https://ui-avatars.com/api/?name=${username}&background=random&color=fff`} 
             alt="Avatar" 
             style={{width: '32px', height: '32px', borderRadius: '50%'}}
+            onClick={() => navigate('/account')}
           />
           <span>{username}</span>
         </div>

@@ -1,0 +1,33 @@
+# Database connection - placeholders only, safe to commit
+//spring.datasource.url=${DB_URL}
+spring.datasource.url=jdbc:h2:mem:flashcard_db;DB_CLOSE_DELAY=-1
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+//spring.datasource.driver-class-name=com.postgresql.Driver
+
+# JPA / Hibernate settings
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
+
+# Cho phép truy cập giao diện quản lý DB tại /h2-console
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+spring.h2.console.settings.web-allow-others=true
+
+# Server settings
+server.port=8080
+
+# JWT Configuration - Use a strong, unique secret in production!
+# Generate a Base64-encoded key with at least 256 bits (32+ bytes)
+jwt.secret=${JWT_SECRET}
+jwt.expiration=86400000
+
+# CORS Configuration - comma-separated list of allowed origins
+cors.allowed-origins=http://localhost:3000,http://localhost:5173
+
+# OpenAI API Configuration
+spring.ai.openai.api-key=${OPENAI_API_KEY}
+spring.ai.openai.chat.options.model=gpt-3.5-turbo
+spring.ai.openai.chat.options.temperature=0.7

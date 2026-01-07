@@ -1,33 +1,39 @@
-/* LoginPage.css */
+/* LoginPage.css (Blue theme - match App.css) */
 
 * {
   box-sizing: border-box;
 }
 
-.login-page {
+/* dùng chung cho Login + ChangePassword (nếu bạn đặt class change-password-page) */
+.login-page,
+.change-password-page {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  /* Đồng bộ màu nền Gradient tím nhạt hiện đại */
-  background: linear-gradient(135deg, #F9F9FF 0%, #E1E1FA 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  /* Match App.css body gradient */
+  background: linear-gradient(135deg, #f0f9ff 0%, #cbebff 100%);
+  font-family: 'Segoe UI', Inter, Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.login-card {
+/* Card */
+.login-card,
+.change-password-card {
   background: #ffffff;
   padding: 2.5rem;
   border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(108, 92, 231, 0.15); /* Bóng tím nhẹ */
+  box-shadow: 0 15px 35px rgba(52, 152, 219, 0.18); /* blue shadow */
   width: 100%;
   max-width: 400px;
   animation: fadeIn 0.5s ease-in-out;
 }
 
-.login-title {
+.login-title,
+.change-password-title {
   text-align: center;
   margin-bottom: 2rem;
-  color: #333;
+  color: #2c3e50; /* same tone as App.css text */
   font-weight: 700;
   font-size: 1.8rem;
 }
@@ -41,60 +47,77 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
-.form-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #555;
+/* Scope để không đè form ở page khác */
+.login-page .form-label,
+.change-password-page .form-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #7f8c8d;
+  text-transform: uppercase;
 }
 
-.form-input {
+.login-page .form-input,
+.change-password-page .form-input {
   padding: 12px 15px;
   border: 1px solid #e1e1e1;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 1rem;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   outline: none;
-  background-color: #fbfbfb; /* Màu nền input hơi xám nhẹ */
+  background-color: #fbfbfb;
 }
 
-.form-input:focus {
-  border-color: #6c5ce7;
+.login-page .form-input:focus,
+.change-password-page .form-input:focus {
+  border-color: var(--primary, #3498db);
   background-color: #fff;
-  box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); /* Viền sáng tím khi focus */
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
 }
 
+/* Button */
 .btn-primary {
   margin-top: 1rem;
   padding: 14px;
-  background: linear-gradient(to right, #6c5ce7, #a29bfe); /* Nút Gradient */
+  background: linear-gradient(
+    to right,
+    var(--primary, #3498db),
+    var(--primary-dark, #2980b9)
+  );
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px); /* Hiệu ứng nổi lên khi di chuột */
-  box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(52, 152, 219, 0.25);
+  filter: brightness(1.02);
+}
+
+.btn-primary:active {
+  transform: translateY(0px);
+  box-shadow: 0 8px 16px rgba(52, 152, 219, 0.18);
 }
 
 .auth-link {
-  margin-top: 1.5rem;
+  margin-top: 1.4rem;
   text-align: center;
-  font-size: 0.9rem;
-  color: #666;
+  font-size: 0.95rem;
+  color: #7f8c8d;
 }
 
 .auth-link a {
-  color: #6c5ce7;
+  color: var(--primary-dark, #2980b9);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .auth-link a:hover {
@@ -102,6 +125,6 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
+  from { opacity: 0; transform: translateY(-18px); }
   to { opacity: 1; transform: translateY(0); }
 }

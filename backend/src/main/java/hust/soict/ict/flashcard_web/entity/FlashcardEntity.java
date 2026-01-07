@@ -2,7 +2,19 @@ package hust.soict.ict.flashcard_web.entity;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "flashcards")
 public class FlashcardEntity {
@@ -15,6 +27,9 @@ public class FlashcardEntity {
     @JoinColumn(name = "deck_id", referencedColumnName = "deck_id", nullable = false)
     private DeckEntity deck;
 
+    @OneToMany (mappedBy = "flashcard", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SessionFlashcardEntity> sessionFlashcards = new ArrayList<>();
+
     @Column (name = "question_text", columnDefinition = "TEXT", nullable = false)
     private String question;
 
@@ -24,50 +39,12 @@ public class FlashcardEntity {
     @Column(columnDefinition =  "TEXT")
     private String hint;
 
+    /**
+     * Cached AI-generated distractors for MCQ mode.
+     * Stored as comma-separated values to avoid repeated AI calls.
+     * Example: "London,Berlin,Madrid"
+     */
+    @Column(name = "distractors", columnDefinition = "TEXT")
+    private String distractors;
 
-
-    public FlashcardEntity() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public DeckEntity getDeck() {
-        return deck;
-    }
-    public void setDeck(DeckEntity deck) {
-        this.deck = deck;
-    }
-
-    public Long getDeckId() {
-        return deck !=  null ? deck.getId() : null;
-    }
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(String answer) {
-        this.answer = answer;
-    }
-
-    public String getHint() {
-        return hint;
-    }
-
-    public void setHint(String hint) {
-        this.hint = hint;
-    }
 }

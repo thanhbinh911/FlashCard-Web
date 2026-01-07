@@ -1,81 +1,102 @@
 package hust.soict.ict.flashcard_web.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import hust.soict.ict.flashcard_web.dto.FlashcardRequest;
 import hust.soict.ict.flashcard_web.dto.FlashcardResponse;
+import hust.soict.ict.flashcard_web.dto.MessageResponse;
 import hust.soict.ict.flashcard_web.service.FlashcardService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-/**
- * This controller handles RESTful API requests related to flashcards.
- * It provides endpoints for creating, retrieving, updating, and deleting flashcards
- * within the context of a specific deck. All operations are secured and require
- * user authentication and ownership of the parent deck.
- */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/decks/{deckId}/flashcards")
 public class FlashcardController {
 
-    @Autowired
-    private FlashcardService flashcardService;
+    private final FlashcardService flashcardService;
+
+    public FlashcardController(FlashcardService flashcardService) {
+        this.flashcardService = flashcardService;
+    }
 
     /**
-     * Retrieves all flashcards associated with a specific deck.
-     * The user must be the owner of the deck.
-     *
-     * @param deckId The ID of the deck from which to retrieve flashcards.
-     * @return A `ResponseEntity` containing a list of `FlashcardResponse` objects.
+     * Get all flashcards in a deck
+     * GET /api/decks/{deckId}/flashcards
      */
-    @GetMapping("/decks/{deckId}/flashcards")
-    public ResponseEntity<List<FlashcardResponse>> getFlashcardsByDeck(@PathVariable Long deckId) {
-        List<FlashcardResponse> flashcards = flashcardService.getFlashcardsByDeck(deckId);
+    @GetMapping
+    @PreAuthorize("@securityService.canViewDeck(#deckId, authentication)")
+    public ResponseEntity<List<FlashcardResponse>> getFlashcardsByDeck(
+            @PathVariable Long deckId, 
+            Authentication authentication) {
+        List<FlashcardResponse> flashcards = flashcardService.getFlashcardsByDeck(deckId, authentication);
         return ResponseEntity.ok(flashcards);
     }
 
     /**
-     * Creates a new flashcard within a specific deck.
-     * The user must be the owner of the deck.
-     *
-     * @param deckId  The ID of the deck where the new flashcard will be created.
-     * @param request The request body containing the details of the new flashcard (question, answer, hint).
-     * @return A `ResponseEntity` containing the created `FlashcardResponse` object.
+     * Get a single flashcard
+     * GET /api/decks/{deckId}/flashcards/{flashcardId}
      */
-    @PostMapping("/decks/{deckId}/flashcards")
-    public ResponseEntity<FlashcardResponse> createFlashcard(@PathVariable Long deckId, @RequestBody FlashcardRequest request) {
-        FlashcardResponse newFlashcard = flashcardService.createFlashcard(deckId, request);
+    @GetMapping("/{flashcardId}")
+    @PreAuthorize("@securityService.canViewFlashcard(#deckId, authentication)")
+    public ResponseEntity<FlashcardResponse> getFlashcardById(
+            @PathVariable Long deckId,
+            @PathVariable Long flashcardId,
+            Authentication authentication) {
+        FlashcardResponse flashcard = flashcardService.getFlashcardById(deckId, flashcardId, authentication);
+        return ResponseEntity.ok(flashcard);
+    }
+
+    /**
+     * Create a new flashcard in a deck
+     * POST /api/decks/{deckId}/flashcards
+     */
+    @PostMapping
+    @PreAuthorize("isAuthenticated() and @securityService.isDeckOwner(#deckId, authentication)")
+    public ResponseEntity<FlashcardResponse> createFlashcard(
+            @PathVariable Long deckId, 
+            @Valid @RequestBody FlashcardRequest request, 
+            Authentication authentication) {
+        FlashcardResponse newFlashcard = flashcardService.createFlashcard(deckId, request, authentication);
         return ResponseEntity.ok(newFlashcard);
     }
 
     /**
-     * Updates an existing flashcard.
-     * The user must be the owner of the flashcard's parent deck.
-     *
-     * @param flashcardId The ID of the flashcard to update.
-     * @param request     The request body with the updated flashcard details.
-     * @return A `ResponseEntity` containing the updated `FlashcardResponse` object.
+     * Update a flashcard
+     * PUT /api/decks/{deckId}/flashcards/{flashcardId}
      */
-    @PutMapping("/flashcards/{flashcardId}")
-    public ResponseEntity<FlashcardResponse> updateFlashcard(@PathVariable Long flashcardId, @RequestBody FlashcardRequest request) {
-        FlashcardResponse updatedFlashcard = flashcardService.updateFlashcard(flashcardId, request);
+    @PutMapping("/{flashcardId}")
+    @PreAuthorize("isAuthenticated() and @securityService.isDeckOwner(#deckId, authentication)")
+    public ResponseEntity<FlashcardResponse> updateFlashcard(
+            @PathVariable Long deckId,
+            @PathVariable Long flashcardId, 
+            @Valid @RequestBody FlashcardRequest request, 
+            Authentication authentication) {
+        FlashcardResponse updatedFlashcard = flashcardService.updateFlashcard(deckId, flashcardId, request, authentication);
         return ResponseEntity.ok(updatedFlashcard);
     }
 
     /**
-     * Deletes a flashcard by its ID.
-     * The user must be the owner of the flashcard's parent deck.
-     *
-     * @param flashcardId The ID of the flashcard to delete.
-     * @return A `ResponseEntity` with a success message.
+     * Delete a flashcard
+     * DELETE /api/decks/{deckId}/flashcards/{flashcardId}
      */
-    @DeleteMapping("/flashcards/{flashcardId}")
-    public ResponseEntity<Map<String, String>> deleteFlashcard(@PathVariable Long flashcardId) {
-        flashcardService.deleteFlashcard(flashcardId);
-        Map<String, String> response = Collections.singletonMap("message", "Flashcard deleted successfully");
-        return ResponseEntity.ok(response);
+    @DeleteMapping("/{flashcardId}")
+    @PreAuthorize("isAuthenticated() and @securityService.isDeckOwner(#deckId, authentication)")
+    public ResponseEntity<MessageResponse> deleteFlashcard(
+            @PathVariable Long deckId,
+            @PathVariable Long flashcardId, 
+            Authentication authentication) {
+        flashcardService.deleteFlashcard(deckId, flashcardId, authentication);
+        return ResponseEntity.ok(new MessageResponse("Flashcard deleted successfully"));
     }
 }

@@ -1,6 +1,6 @@
 HELP.md
 backend/target/
-.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# Environment variables (ignore all .env files)
+.env
+
+backend/src/main/resources/application*.properties
+
