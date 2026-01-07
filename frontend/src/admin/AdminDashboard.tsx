@@ -59,7 +59,7 @@ function AdminDashboard() {
           <div className="recent-activities">
             <h3>Recent Activities</h3>
             <ul>
-              {recentActivities.map((activity, index) => (
+              {Array.isArray(recentActivities) && recentActivities.map((activity, index) => (
                 <li key={index}>{activity}</li>
               ))}
             </ul>

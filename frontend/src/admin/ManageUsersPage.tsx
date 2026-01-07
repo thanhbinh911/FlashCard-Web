@@ -1,17 +1,23 @@
-import React, { use, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
+
+// Định nghĩa Interface dựa trên AdminUserResponse.java của bạn
+interface UserResponse {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  lastLogin: string;
+  deckCount: number;
+  totalStudySessions: number;
+}
 
 function ManageUsersPage() {
   const navigate = useNavigate();
-  const [id, setId] = React.useState<number>(0);
-  const [username, setUsername] = React.useState<string>('');
-  const [firstName, setFirstName] = React.useState<string>('');
-  const [lastName, setLastName] = React.useState<string>('');
-  const [email, setEmail] = React.useState<string>('');
-  const [role, setRole] = React.useState<string>('');
-  const [lastLogin, setLastLogin] = React.useState<string>('');
-  const [deckCount, setDeckCount] = React.useState<number>(0);
-  const [totalStudySessions, setTotalStudySessions] = React.useState<number>(0);
+  // Thay đổi state từ các biến đơn lẻ sang một mảng users
+  const [users, setUsers] = React.useState<UserResponse[]>([]);
 
   useEffect(() => {
     fetch(`http://localhost:8080/api/admin/users`, {
@@ -23,39 +29,59 @@ function ManageUsersPage() {
     })
       .then(res => res.json())
       .then(data => {
-        setId(data.id);
-        setUsername(data.username);
-        setFirstName(data.firstName);
-        setLastName(data.lastName);
-        setEmail(data.email);
-        setRole(data.role);
-        setLastLogin(data.lastLogin);
-        setDeckCount(data.deckCount);
-        setTotalStudySessions(data.totalStudySessions);
+        // data ở đây là List<AdminUserResponse> từ Java
+        if (Array.isArray(data)) {
+          setUsers(data);
+        }
       })
       .catch(err => console.error("Error fetching user data:", err));
   }, []);
 
   return (
-    <>
-      <div className="container">
-        <h2 className="page-title">Manage Users</h2>
-        <p>Welcome to the Manage Users Page.</p>
-        <div className="user-details">
-          <p><strong>User ID:</strong> {id}</p>
-          <p><strong>Username:</strong> {username}</p>
-          <p><strong>First Name:</strong> {firstName}</p>
-          <p><strong>Last Name:</strong> {lastName}</p>
-          <p><strong>Email:</strong> {email}</p>
-          <p><strong>Role:</strong> {role}</p>
-          <p><strong>Last Login:</strong> {lastLogin}</p>
-          <p><strong>Number of Decks:</strong> {deckCount}</p>
-          <p><strong>Total Study Sessions:</strong> {totalStudySessions}</p>
-        </div>
-        <button onClick={() => navigate('/admin/manage-user-decks/' + id)}>Manage User's Decks</button>
-        <button onClick={() => navigate('/admin/dashboard')}>Back to Dashboard</button>
+    <div className="container">
+      <h2 className="page-title">Manage Users</h2>
+      <p>Users List</p>
+      
+      <table className="user-table" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+        <thead>
+          <tr style={{ borderBottom: '2px solid #ccc', textAlign: 'left' }}>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Decks</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map(user => (
+            <tr key={user.id} style={{ borderBottom: '1px solid #eee' }}>
+              <td>{user.id}</td>
+              <td>{user.username}</td>
+              <td>{user.firstName} {user.lastName}</td>
+              <td>{user.email}</td>
+              <td>{user.role}</td>
+              <td>{user.deckCount}</td>
+              <td>
+                <button 
+                  onClick={() => navigate('/admin/manage-user-decks/' + user.id)}
+                  className="btn-small"
+                >
+                  Manage Decks
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div style={{ marginTop: '20px' }}>
+        <button className="btn btn-secondary" onClick={() => navigate('/admin/dashboard')}>
+          Back to Dashboard
+        </button>
       </div>
-    </>
+    </div>
   )
 }
 

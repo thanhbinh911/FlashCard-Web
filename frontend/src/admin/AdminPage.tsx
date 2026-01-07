@@ -14,6 +14,7 @@ function AdminPage() {
           <button className="btn btn-primary" onClick={() => navigate('/admin/manage-users')}>
             Manage Users
           </button>
+          <button className="btn btn-primary" onClick={() => navigate('/flashcards')}>Back to Home page</button>
         </div>
       </div>
     </>

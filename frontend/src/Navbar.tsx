@@ -28,6 +28,9 @@ const Navbar = () => {
       </div>
       
       <div className="nav-links">
+        <div className={`nav-link ${isActive('/admin')}`} onClick={() => navigate('/admin')}>
+          <FaLayerGroup /> Admin
+        </div>
         {/* Practice route */}
         <div className={`nav-link ${isActive('/flashcards')}`} onClick={() => navigate('/flashcards')}>
           <FaLayerGroup /> Practice
