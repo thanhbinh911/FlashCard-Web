@@ -22,7 +22,7 @@ public class SessionSummaryResponse {
     private LocalDateTime endedAt;
     private Integer totalCards;
     private Integer correctCount;
-    private Boolean isPracticeMode;
+    private String sessionMode;
     private List<QuestionSummary> questions;
 
     @AllArgsConstructor

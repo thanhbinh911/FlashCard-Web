@@ -22,7 +22,7 @@ public class DeckRequest {
     
     private String description;
     
-    private boolean isPublic;
+    private boolean publicDeck;
     
     @Size(min = 2, message = "At least 2 flashcards are required to create a deck")
     @Valid

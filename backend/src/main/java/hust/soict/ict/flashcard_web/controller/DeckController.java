@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,6 +38,19 @@ public class DeckController {
         return ResponseEntity.ok(decks);
     }
 
+    @GetMapping("/public")
+    public ResponseEntity<List<DeckResponse>> getPublicDecks() {
+        List<DeckResponse> decks = deckService.getPublicDecks();
+        return ResponseEntity.ok(decks);
+    }
+
+    @GetMapping("/my")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<DeckResponse>> getMyDecks(Authentication authentication) {
+        List<DeckResponse> decks = deckService.getMyDecks(authentication);
+        return ResponseEntity.ok(decks);
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<DeckResponse>> searchDecks(
             @RequestParam(required = false, defaultValue = "") String keyword,
@@ -58,7 +72,6 @@ public class DeckController {
     
 
     @GetMapping("/{deckId}")
-    @PreAuthorize("@securityService.canViewDeck(#deckId, authentication)")
     public ResponseEntity<DeckResponse> getDeckById(
             @PathVariable Long deckId, 
             Authentication authentication) {
@@ -73,6 +86,20 @@ public class DeckController {
             @Valid @RequestBody DeckRequest request, 
             Authentication authentication) {
         DeckResponse updatedDeck = deckService.updateDeck(deckId, request, authentication);
+        return ResponseEntity.ok(updatedDeck);
+    }
+
+    @PatchMapping("/{deckId}/visibility")
+    @PreAuthorize("isAuthenticated() and @securityService.isDeckOwner(#deckId, authentication)")
+    public ResponseEntity<DeckResponse> toggleVisibility(
+            @PathVariable Long deckId,
+            @RequestBody java.util.Map<String, Boolean> body,
+            Authentication authentication) {
+        Boolean publicDeck = body.get("publicDeck");
+        if (publicDeck == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        DeckResponse updatedDeck = deckService.updateVisibility(deckId, publicDeck, authentication);
         return ResponseEntity.ok(updatedDeck);
     }
 

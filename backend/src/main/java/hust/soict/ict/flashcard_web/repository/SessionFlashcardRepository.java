@@ -12,4 +12,7 @@ public interface SessionFlashcardRepository extends JpaRepository<SessionFlashca
     
     
     Optional<SessionFlashcardEntity> findBySession_IdAndFlashcard_Id(Long sessionId, Long flashcardId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT sf FROM SessionFlashcardEntity sf LEFT JOIN FETCH sf.flashcard WHERE sf.session.id = :sessionId")
+    List<SessionFlashcardEntity> findAllBySessionIdWithFlashcard(@org.springframework.data.repository.query.Param("sessionId") Long sessionId);
 }

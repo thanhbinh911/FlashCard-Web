@@ -1,6 +1,5 @@
 package hust.soict.ict.flashcard_web.dto;
 
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,4 +14,7 @@ public class DeckResponse {
     private String description;
     @Setter(AccessLevel.NONE)
     private String createdAt;
+    private boolean publicDeck;
+    private String ownerUsername;
+    private int flashcardCount;
 }

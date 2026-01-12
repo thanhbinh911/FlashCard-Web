@@ -16,7 +16,6 @@ public class StartSessionResponse {
     private LocalDateTime startedAt;
     private Long timeLimitSeconds;
     private String status;
-    private Boolean isPracticeMode;
     private String sessionMode;  // "REGULAR", "MCQ", or "REVIEW"
     private Object questions;    // Type depends on mode (List<SessionFlashcardDto>, List<MCQ>, etc.)
 }

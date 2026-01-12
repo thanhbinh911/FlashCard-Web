@@ -111,7 +111,7 @@ public class AdminService {
                         d.getUser() != null ? d.getUser().getId() : null,
                         d.getUser() != null ? d.getUser().getUsername() : null,
                         d.getFlashcards() != null ? d.getFlashcards().size() : 0,
-                        d.isPublic(),
+                        d.isPublicDeck(),
                         d.getCreatedAt()
                 ))
                 .collect(Collectors.toList());
@@ -130,7 +130,7 @@ public class AdminService {
                         d.getUser() != null ? d.getUser().getId() : null,
                         d.getUser() != null ? d.getUser().getUsername() : null,
                         d.getFlashcards() != null ? d.getFlashcards().size() : 0,
-                        d.isPublic(),
+                        d.isPublicDeck(),
                         d.getCreatedAt()
                 ))
                 .collect(Collectors.toList());

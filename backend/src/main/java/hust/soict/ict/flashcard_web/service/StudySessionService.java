@@ -55,30 +55,38 @@ public class StudySessionService {
 
     /**
      * Create a new study session.
-     * Throws if user already has an active session for this deck.
+     * For test mode (REGULAR, MCQ): saves to database for resume capability.
+     * For review mode: use getReviewQuestions() instead - it's ephemeral.
+     * 
+     * Throws if user already has an active test session for this deck.
      */
     @Transactional
     public StudySessionEntity createNewSession(Long deckId, Authentication authentication, 
-                                                Long timeLimitSeconds, Boolean isPracticeMode, String sessionMode) {
+                                                Long timeLimitSeconds, String sessionMode) {
         if (deckId == null) {
             throw new IllegalArgumentException("Deck ID cannot be null");
+        }
+        
+        // Validate and normalize session mode
+        String normalizedMode = (sessionMode == null || sessionMode.isBlank()) 
+                ? "REGULAR" 
+                : sessionMode.toUpperCase();
+        
+        // REVIEW mode should use getReviewQuestions instead - it's ephemeral
+        if ("REVIEW".equals(normalizedMode)) {
+            throw new IllegalArgumentException("REVIEW mode sessions are ephemeral. Use getReviewQuestions() instead.");
         }
         
         Long authUserId = securityService.getAuthUserId(authentication);
         DeckEntity deck = deckRepository.findById(deckId)
                 .orElseThrow(() -> new ResourceNotFoundException("Deck not found"));
 
-        // Check if user already has an active session for this deck
+        // Check if user already has an active test session for this deck
         Optional<StudySessionEntity> existing = sessionRepository.findByUser_IdAndDeck_IdAndStatus(
                 authUserId, deckId, StudySessionEntity.SessionStatus.IN_PROGRESS);
         if (existing.isPresent()) {
             throw new IllegalStateException("Active session already exists for this deck. Resume or abandon it first.");
         }
-
-        // Validate and normalize session mode
-        String normalizedMode = (sessionMode == null || sessionMode.isBlank()) 
-                ? "REGULAR" 
-                : sessionMode.toUpperCase();
 
         StudySessionEntity s = new StudySessionEntity();
         UserEntity user = new UserEntity();
@@ -86,7 +94,6 @@ public class StudySessionService {
         s.setUser(user);
         s.setDeck(deck);
         s.setTimeLimitSeconds(timeLimitSeconds);
-        s.setIsPracticeMode(isPracticeMode != null && isPracticeMode);
         s.setSessionMode(normalizedMode);
         s.setStatus(StudySessionEntity.SessionStatus.IN_PROGRESS);
 
@@ -111,6 +118,63 @@ public class StudySessionService {
         }
 
         return s;
+    }
+
+    /**
+     * Get review questions for a deck without creating a persisted session.
+     * REVIEW mode is ephemeral - no database storage, no resume capability.
+     * 
+     * @param deckId The deck to review
+     * @param sessionMode The mode (REGULAR, MCQ, REVIEW)
+     * @return List of questions formatted according to the session mode
+     */
+    @Transactional(readOnly = true)
+    public Object getReviewQuestions(Long deckId, String sessionMode) {
+        if (deckId == null) {
+            throw new IllegalArgumentException("Deck ID cannot be null");
+        }
+        
+        deckRepository.findById(deckId)
+                .orElseThrow(() -> new ResourceNotFoundException("Deck not found"));
+        
+        String normalizedMode = (sessionMode == null || sessionMode.isBlank()) 
+                ? "REVIEW" 
+                : sessionMode.toUpperCase();
+        
+        SessionMode mode = sessionModeFactory.getMode(normalizedMode);
+        
+        List<FlashcardEntity> cards = flashcardRepository.findByDeck_Id(deckId);
+        if (cards == null || cards.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
+        // Shuffle for random order
+        Collections.shuffle(cards);
+        
+        // Convert to SessionFlashcardEntity format for compatibility with SessionMode
+        List<SessionFlashcardEntity> tempFlashcards = new ArrayList<>();
+        int pos = 1;
+        for (FlashcardEntity f : cards) {
+            SessionFlashcardEntity temp = new SessionFlashcardEntity();
+            temp.setFlashcard(f);
+            temp.setPosition(pos++);
+            tempFlashcards.add(temp);
+        }
+        
+        return mode.getQuestions(tempFlashcards);
+    }
+
+    /**
+     * Get all unfinished test sessions for the user (REGULAR or MCQ mode).
+     * These are the sessions that can be resumed.
+     */
+    @Transactional(readOnly = true)
+    public List<StudySessionEntity> getUnfinishedTestSessions(Authentication authentication) {
+        Long authUserId = securityService.getAuthUserId(authentication);
+        return sessionRepository.findUnfinishedTestSessions(
+            authUserId, 
+            StudySessionEntity.SessionStatus.IN_PROGRESS
+        );
     }
 
     /**
@@ -267,7 +331,7 @@ public class StudySessionService {
         if (sessionId == null) {
             throw new IllegalArgumentException("Session ID cannot be null");
         }
-        return sessionFlashcardRepository.findBySession_Id(sessionId).stream()
+        return sessionFlashcardRepository.findAllBySessionIdWithFlashcard(sessionId).stream()
                 .sorted(Comparator.comparingInt(SessionFlashcardEntity::getPosition))
                 .collect(Collectors.toList());
     }
@@ -276,20 +340,23 @@ public class StudySessionService {
      * Complete a session and calculate results.
      */
     private SessionResultResponse completeSession(StudySessionEntity session) {
-        if (session.getStatus() != StudySessionEntity.SessionStatus.COMPLETED) {
-            session.setEndedAt(LocalDateTime.now());
-            session.setStatus(StudySessionEntity.SessionStatus.COMPLETED);
-        }
-        sessionRepository.save(session);
-
-        List<SessionFlashcardEntity> attempts = sessionFlashcardRepository.findBySession_Id(session.getId());
+        LocalDateTime now = LocalDateTime.now();
+        
+        // Update status and end time
+        session.setEndedAt(now);
+        session.setStatus(StudySessionEntity.SessionStatus.COMPLETED);
+        
+        // Count correct answers
+        List<SessionFlashcardEntity> attempts = sessionFlashcardRepository.findAllBySessionIdWithFlashcard(session.getId());
         
         int correctCount = (int) attempts.stream()
                 .filter(a -> Boolean.TRUE.equals(a.getCorrect()))
                 .count();
         
         session.setCorrectAnswersCount(correctCount);
-        sessionRepository.save(session);
+        
+        // Save everything (status + count) immediately
+        sessionRepository.saveAndFlush(session);
 
         int total = session.getTotalCards() != null ? session.getTotalCards() : 0;
         return new SessionResultResponse(session.getId(), correctCount, total, session.getEndedAt());
@@ -309,7 +376,7 @@ public class StudySessionService {
 
         securityService.verifySessionOwnership(sessionId, authentication);
 
-        List<SessionFlashcardEntity> attempts = sessionFlashcardRepository.findBySession_Id(sessionId);
+        List<SessionFlashcardEntity> attempts = sessionFlashcardRepository.findAllBySessionIdWithFlashcard(sessionId);
         int correctCount = (int) attempts.stream()
                 .filter(a -> Boolean.TRUE.equals(a.getCorrect()))
                 .count();
@@ -337,7 +404,7 @@ public class StudySessionService {
                 session.getEndedAt(),
                 session.getTotalCards(),
                 correctCount,
-                session.getIsPracticeMode(),
+                session.getSessionMode(),
                 questionSummaries
         );
     }

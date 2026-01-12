@@ -53,6 +53,5 @@ public class DeckEntity {
     private LocalDateTime createdAt;
 
     @Column(name = "is_public", nullable = false)
-    private boolean isPublic;
-
+    private boolean publicDeck;
 }

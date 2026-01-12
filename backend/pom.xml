@@ -103,6 +103,7 @@
             <version>5.2.2</version>
         </dependency>
 
+
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <!-- this dependency help reduce writing boilerplate code for constructor, setter, getter method ,etc -->
         <dependency>
@@ -116,6 +117,19 @@
             <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-63</artifactId>
+            <version>3.7.0</version>
+        </dependency>
+
+        <!-- Spring Boot DevTools for hot reloading -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <!-- Spring AI BOM for version management -->

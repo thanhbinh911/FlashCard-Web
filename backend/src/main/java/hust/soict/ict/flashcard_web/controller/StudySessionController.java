@@ -53,17 +53,39 @@ public class StudySessionController {
 
     /**
      * Create a new session.
-     * Fails if user already has an active session for this deck.
+     * For test mode (REGULAR, MCQ): creates a persistent session that can be resumed.
+     * For review mode (REVIEW): returns questions directly without persisting.
      */
     @PostMapping("/start")
     public ResponseEntity<?> startSession(@RequestBody CreateSessionRequest req,
                                           Authentication authentication) {
+        String sessionMode = req.getSessionMode() != null ? req.getSessionMode().toUpperCase() : "REGULAR";
+        
+        // REVIEW mode: return questions directly without creating a session
+        if ("REVIEW".equals(sessionMode)) {
+            Object questions = studySessionService.getReviewQuestions(
+                    req.getDeckId(),
+                    sessionMode
+            );
+            
+            StartSessionResponse response = new StartSessionResponse(
+                    null, // No session ID for review
+                    null, // No start time
+                    null, // No time limit
+                    "REVIEW",
+                    sessionMode,
+                    questions
+            );
+            
+            return ResponseEntity.ok(response);
+        }
+        
+        // Test mode (REGULAR or MCQ): create a persistent session
         StudySessionEntity session = studySessionService.createNewSession(
                 req.getDeckId(), 
                 authentication, 
                 req.getTimeLimitSeconds(), 
-                req.getIsPracticeMode(),
-                req.getSessionMode()
+                sessionMode
         );
         
         Object questions = studySessionService.getSessionQuestions(session.getId());
@@ -73,7 +95,6 @@ public class StudySessionController {
                 session.getStartedAt(),
                 session.getTimeLimitSeconds(),
                 session.getStatus().name(),
-                session.getIsPracticeMode(),
                 session.getSessionMode(),
                 questions
         );
@@ -96,7 +117,6 @@ public class StudySessionController {
                 session.getStartedAt(),
                 session.getTimeLimitSeconds(),
                 session.getStatus().name(),
-                session.getIsPracticeMode(),
                 session.getSessionMode(),
                 questions
         );
@@ -172,9 +192,44 @@ public class StudySessionController {
                 session.getTimeLimitSeconds(),
                 session.getStatus().name(),
                 session.getTotalCards(),
-                session.getIsPracticeMode(),
+                session.getSessionMode(),
                 flashcards
         ));
+    }
+
+    /**
+     * Get all unfinished test sessions for the authenticated user.
+     * Returns only REGULAR or MCQ mode sessions (timed tests).
+     */
+    @GetMapping("/unfinished")
+    public ResponseEntity<List<ActiveSessionResponse>> getUnfinishedSessions(Authentication authentication) {
+        List<StudySessionEntity> sessions = studySessionService.getUnfinishedTestSessions(authentication);
+        
+        // Defensive coding: Explicitly filter to ensure no COMPLETED sessions leak out
+        // even if the repository query behaves unexpectedly
+        sessions = sessions.stream()
+                .filter(s -> s.getStatus() == StudySessionEntity.SessionStatus.IN_PROGRESS)
+                .collect(Collectors.toList());
+        
+        if (sessions.isEmpty()) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+        
+        List<ActiveSessionResponse> responses = sessions.stream()
+            .map(session -> new ActiveSessionResponse(
+                session.getId(),
+                session.getDeck().getId(),
+                session.getDeck().getTitle(),
+                session.getStartedAt(),
+                session.getTimeLimitSeconds(),
+                session.getStatus().name(),
+                session.getTotalCards(),
+                session.getSessionMode(),
+                null // Don't include flashcards for list view
+            ))
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(responses);
     }
 
     /**

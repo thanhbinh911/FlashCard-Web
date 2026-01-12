@@ -1,0 +1,219 @@
+.results-page {
+    padding-bottom: var(--spacing-3xl);
+}
+
+.results-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.results-header h1 {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.results-header p {
+    margin: 0;
+}
+
+/* Score Card */
+.score-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-2xl);
+    padding: var(--spacing-3xl);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.score-circle {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: conic-gradient(var(--score-color) calc(var(--percentage, 0) * 1%),
+            var(--color-bg-glass) 0);
+    border-radius: 50%;
+}
+
+.score-circle::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    background: var(--color-bg-secondary);
+    border-radius: 50%;
+}
+
+.score-percentage,
+.score-grade {
+    position: relative;
+    z-index: 1;
+}
+
+.score-percentage {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    line-height: 1;
+}
+
+.score-grade {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.score-details {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xl);
+}
+
+.score-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.stat-value {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+.score-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--color-border);
+}
+
+/* Questions Review */
+.questions-review {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.questions-review h2 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-lg);
+}
+
+.questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.question-review-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.question-review-card.correct {
+    border-left: 4px solid var(--color-success);
+}
+
+.question-review-card.incorrect {
+    border-left: 4px solid var(--color-error);
+}
+
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--color-bg-glass);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.question-number {
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.result-badge {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+}
+
+.result-badge.badge-success {
+    background: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.result-badge.badge-error {
+    background: var(--color-error-light);
+    color: var(--color-error);
+}
+
+.review-content {
+    padding: var(--spacing-lg);
+}
+
+.review-question {
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-primary);
+}
+
+.review-answers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.user-answer,
+.correct-answer {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+}
+
+.answer-label {
+    color: var(--color-text-muted);
+    min-width: 100px;
+}
+
+.answer-text.wrong {
+    color: var(--color-error);
+    text-decoration: line-through;
+}
+
+.answer-text.correct {
+    color: var(--color-success);
+    font-weight: 500;
+}
+
+/* Actions */
+.results-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 640px) {
+    .score-details {
+        gap: var(--spacing-md);
+    }
+
+    .results-actions {
+        flex-direction: column;
+    }
+
+    .results-actions .btn {
+        width: 100%;
+    }
+}

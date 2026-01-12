@@ -72,12 +72,10 @@ public class StudySessionEntity {
     @Column(name = "correct_answers_count")
     private Integer correctAnswersCount = 0;
 
-    @Column(name = "is_practice_mode", nullable = false)
-    private Boolean isPracticeMode = false;
-
     /**
-     * Session mode: "REGULAR", "MCQ", or "REVIEW"
-     * Uses Strategy Pattern for different study modes.
+     * Session mode determines behavior:
+     * - "REGULAR" / "MCQ": Test mode - saved to DB, timed, resumable
+     * - "REVIEW": Review mode - ephemeral, not saved to DB
      */
     @Column(name = "session_mode", nullable = false)
     private String sessionMode = "REGULAR";

@@ -9,7 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import hust.soict.ict.flashcard_web.entity.DeckEntity;
-import hust.soict.ict.flashcard_web.entity.FlashcardEntity;
 import hust.soict.ict.flashcard_web.repository.DeckRepository;
 import hust.soict.ict.flashcard_web.repository.FlashcardRepository;
 import hust.soict.ict.flashcard_web.repository.StudySessionRepository;
@@ -76,47 +75,11 @@ public class SecurityService {
         DeckEntity deck = deckOpt.get();
         
         // Public decks can be viewed by anyone
-        if (deck.isPublic())
+        if (deck.isPublicDeck())
             return true;
         
         // Private decks: check if owner or admin
         return isDeckOwner(deckId, authentication) || isAdmin(authentication);
-    }
-
-    /**
-     * Check if user can view a specific flashcard.
-     * Returns true if: parent deck is public, OR user is owner, OR user is admin.
-     */
-    public boolean canViewFlashcard(Long flashcardId, Authentication authentication) {
-        if (flashcardId == null)
-            return false;
-        
-        Optional<FlashcardEntity> flashcardOpt = flashcardRepository.findById(flashcardId);
-        if (flashcardOpt.isEmpty())
-            return false;
-        
-        FlashcardEntity flashcard = flashcardOpt.get();
-        if (flashcard.getDeck() == null)
-            return false;
-        
-        return canViewDeck(flashcard.getDeck().getId(), authentication);
-    }
-
-    public boolean isFlashcardOwner(Long flashcardId, Authentication authentication) {
-        if (flashcardId == null)
-            return false;
-        Long authUserId = getAuthUserId(authentication);
-        if (authUserId == null)
-            return false;
-        
-        Optional<FlashcardEntity> flashcardOpt = flashcardRepository.findById(flashcardId);
-        if (flashcardOpt.isEmpty())
-            return false;
-        
-        FlashcardEntity flashcard = flashcardOpt.get();
-        return flashcard.getDeck() != null &&
-                flashcard.getDeck().getUser() != null &&
-                authUserId.equals(flashcard.getDeck().getUser().getId());
     }
 
     /**

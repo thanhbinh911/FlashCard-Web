@@ -20,6 +20,6 @@ public class ActiveSessionResponse {
     private Long timeLimitSeconds;
     private String status;
     private Integer totalCards;
-    private Boolean isPracticeMode;
+    private String sessionMode;
     private List<SessionFlashcardDto> flashcards;
 }

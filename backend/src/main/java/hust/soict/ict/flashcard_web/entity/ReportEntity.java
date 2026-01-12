@@ -10,8 +10,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@NoArgsConstructor
+@Getter 
+@Setter
 @Table(name = "reports")
 public class ReportEntity {
     @Id
@@ -33,37 +39,4 @@ public class ReportEntity {
     @Column(name = "created_at", nullable = false, updatable = false, insertable = false,
             columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
-
-    public ReportEntity() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public UserEntity getReportedByUser() {
-        return reportedByUser;
-    }
-    public void setReportedByUser(UserEntity reportedByUser) {
-        this.reportedByUser = reportedByUser;
-    }
-    public DeckEntity getReportedDeck() {
-        return reportedDeck;
-    }
-    public void setReportedDeck(DeckEntity reportedDeck) {
-        this.reportedDeck = reportedDeck;
-    }
-    public String getReason() {
-        return reason;
-    }
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-
 }
